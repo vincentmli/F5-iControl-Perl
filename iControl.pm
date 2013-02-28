@@ -108,8 +108,7 @@ no warnings 'redefine';
 sub SOAP::Deserializer::typecast {
         my ($self, $value, $name, $attrs, $children, $type) = @_;
         return unless ( $type &&
-                        ($ICONTROL_TYPECAST_TYPES{$type} ||
-                         $type =~ /^\Q{urn:com.f5.license.v5b}\E/));
+                        ($ICONTROL_TYPECAST_TYPES{$type} ));
 
         return $value;
 }
