@@ -34,6 +34,15 @@ BEGIN {
 
 }
 
+    use Exporter ();
+    use vars qw(@ISA $VERSION @EXPORT @EXPORT_OK);
+    @ISA = qw(Exporter);
+    @EXPORT = qw();
+    @EXPORT_OK = qw();
+
+$VERSION = "1.00100";
+
+#http://www.indecorous.com/perl/pod/ simple pod howto
 
 =pod
 
@@ -45,14 +54,12 @@ use iControl via SOAP::Lite to manage bigip.
 =head1 SYNOPSIS
 
         use iControl;
-	use iControl::Networking::SelfIP;
 
 	my $iControl = iControl->new(protocol => 'https',
                                    host => 'mgmt_ip',
                                    username => 'admin',
                                    password => 'admin');
 
-	my @selfips = $iControl->get_self_ips();
 
 
 =head1 DESCRIPTION
