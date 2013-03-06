@@ -22,8 +22,8 @@ iControl::Networking::VLAN - iControl Networking VLAN modules
 
 =head1 DESCRIPTION
 
-iControl::Networking::VLAN is a module to manage BIG-IP self ip configuration
-including create/delete/modify selfips on BIG-IP
+iControl::Networking::VLAN is a module to manage BIG-IP VLAN configuration
+including list/create/delete/modify VLANs on BIG-IP
 
 
 =head1 METHODS
@@ -58,18 +58,6 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 =head2 get_vlans 
 
 get list of  vlans on BIG-IP.
-
-=over 4
-
-=item ($self_ips, $vlan_names, $netmasks, $unitid, $floating)
-
-set_self_ip to create self ip for TMOS v9.x/10.x/11.x, unit_ids should be 0
-for non-floating self ip, 1 or 2 for floating self ip, if $floating set to 1
-create floating self ip, if $floating set to 0, create non-floating self ip
-
-=over 4
-
-=back
 
 =cut
 

@@ -28,11 +28,18 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
     # optionally exported functions
 @EXPORT_OK   = qw();
 
-=pod
 
 =head2 get_db_variable
 
 Get the value of a variable from BigIP's DB.
+
+get_db_vairable($key)
+
+=over 4
+
+=item - $key: Get the value of db key $key
+
+=back
 
 =cut
 
@@ -43,7 +50,6 @@ sub get_db_variable {
                 -> proxy($self->{_proxy})
         ;
 
-        # first, get the list of all httpclass objects/profiles
         my $all_som = $soap->query(
                                    SOAP::Data->name(variables => [$key])
                                   );

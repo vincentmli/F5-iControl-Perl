@@ -11,30 +11,33 @@ use iControl::Management::DBVariable;
 
 
 my $selfip = iControl::Networking::SelfIP->new(protocol => 'https',
-                                   host => '172.24.100.119',
+                                   host => '10.3.72.33',
                                    username => 'admin',
-                                   password => 'admin');
+                                   password => 'admin',
+                                   floating_states => 'STATE_ENABLED',
+				   traffic_groups => 'traffic-group-1',
+);
 
 my $db = iControl::Networking::DBVariable->new(protocol => 'https',
-                                   host => '172.24.100.119',
+                                   host => '10.3.72.33',
                                    username => 'admin',
-                                   password => 'admin');
+                                   password => 'admin',
+);
 
 my $unitid = $db->get_db_variable('Failover.UnitId');
 print "unit id $unitid\n";
 
-#$selfip->set_self_ipv2("selfiptest", "esnet-1102", "10.2.72.3", "255.255.0.0", 0);
-$selfip->set_self_ip("10.2.72.3", "internal", "255.255.0.0", 2, 0);
+$selfip->delete_self_ip("10.2.72.35");
+#$selfip->delete_self_ip("selfiptest");
+#$selfip->set_self_ipv2("selfiptest", "int-esnet", "10.2.72.35", "255.255.0.0", 0);
+$selfip->set_self_ipv2("selfiptest", "int-esnet", "10.2.72.35", "255.255.0.0");
+#$selfip->set_self_ip("10.2.72.35", "int-esnet", "255.255.0.0", $unitid);
+#$selfip->set_self_ip("10.2.72.35", "int-esnet", "255.255.0.0");
+#$selfip->delete_self_ip("10.2.72.35");
+$selfip->add_allow_access_list("10.2.72.35");
+#$selfip->add_allow_access_listv2("selfiptest");
 
 my @selfips = $selfip->get_self_ips();
 
 print "$_\n" for @selfips;
 
-my $vlan = iControl::Networking::VLAN->new(protocol => 'https',
-                                   host => '172.24.100.119',
-                                   username => 'admin',
-                                   password => 'admin');
-
-my @vlans = $vlan->get_vlans();
-
-print "$_\n" for @vlans;
