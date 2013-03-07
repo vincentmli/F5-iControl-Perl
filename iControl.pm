@@ -83,24 +83,17 @@ sub new {
 	my $self = {};
 
         # Set proxy from parameters
-        #my $protocol = $arguments{protocol} || DEFAULT_PROTOCOL;
         $self->{protocol} = $arguments{protocol} || DEFAULT_PROTOCOL;
 	$self->{username} = $arguments{username};
 	$self->{password} = $arguments{password};
         my $authentication = '';
         if ($arguments{username} && $arguments{password}) {
           $authentication .= "$arguments{username}:$arguments{password}\@";
-	  #$self->{authentication} .= "$arguments{username}:$arguments{password}\@";
         }
-        #my $host .= $arguments{host} || DEFAULT_HOST;
         $self->{host} .= $arguments{host} || DEFAULT_HOST;
-        #my $port .= $arguments{port} || ($arguments{protocol} && $arguments{protocol} eq 'https' ?
         $self->{port} .= $arguments{port} || ($arguments{protocol} && $arguments{protocol} eq 'https' ?
                                          DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT);
         my $proxy_uri .= $arguments{proxy_uri} || DEFAULT_PROXY_URI;
-        #$self->{proxy_uri} .= $arguments{proxy_uri} || DEFAULT_PROXY_URI;
-        #my $proxy = "$protocol://$authentication$host:$port/$proxy_uri";
-        #$self->{proxy} = "$protocol://$authentication$host:$port/$proxy_uri";
         my $proxy = "$self->{protocol}://$authentication$self->{host}:$self->{port}/$proxy_uri";
 
 	$self->{_proxy} = $proxy;
@@ -109,9 +102,6 @@ sub new {
 
 	$self;
 
-        #bless {
-        #        _proxy    => $proxy,
-        #} , $class;
 }
 
 sub check_error {

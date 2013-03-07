@@ -17,7 +17,11 @@ iControl::Networking::SelfIP - iControl Networking SelfIP modules
         my $iControl = iControl::Networking::SelfIP->new(protocol => 'https',
                                    host => 'mgmt_ip',
                                    username => 'user',
-                                   password => 'password');
+                                   password => 'password',
+				   floating_states => 'STATE_ENABLED',
+				   traffic_groups => 'traffic-group-1',
+				   
+			);
 
 	$iControl->set_self_ipv2($self_ips, $vlan_names, $addresses, $netmasks)
 
@@ -86,7 +90,7 @@ sub new {
 	my $self = $class->SUPER::new(%arguments);
 
 	$self->{floating_states} .= $arguments{floating_states} || "$STATE_DISABLED";
-	my $db = iControl::Networking::DBVariable->new(%arguments); 
+	my $db = iControl::Management::DBVariable->new(%arguments); 
 	$self->{unit_id} .= $db->get_db_variable('Failover.UnitId') || "$NON_FLOATING_UNIT_ID";
 	$self->{traffic_groups} .= $arguments{traffic_groups} || "$TRAFFIC_GROUP_LOCAL_ONLY";
 
@@ -161,10 +165,10 @@ sub delete_self_ip {
 
 create selfip on BIG-IP for TMOS 11.x.
 
-set_self_ipv2($self_ips, $vlan_names, $addresses, $netmasks, $floating)
+set_self_ipv2($self_ips, $vlan_names, $addresses, $netmasks)
 
 default to create non-floating selfip, otherwise, floating_states and 
-traffic_groups attributes can be specified in contructor.
+traffic_groups attributes can be specified in constructor.
 
 =over 4
 
@@ -205,11 +209,11 @@ sub set_self_ipv2 {
 
 create selfip on BIG-IP for TMOS v9.x/10.x/11.x
 
-set_self_ip($self_ips, $vlan_names, $netmasks, $unitid, $floating)
+set_self_ip($self_ips, $vlan_names, $netmasks, $unitid)
 
 =over 4
 
-=item - $self_ips: The self IPs to create<br>
+=item - $self_ips: The self IPs to create
 
 =item - $vlan_names: The VLANs that the new self IPs will be on
 
@@ -260,7 +264,7 @@ sub add_allow_access_listv2 {
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->add_allow_access_list(
         SOAP::Data->name( self_ips        => ["$self_ips"] ),
-        SOAP::Data->name( access_lists => [ { mode => "$ALLOW_MODE_DEFAULTS", protocol_ports => [] } ] ),
+        SOAP::Data->name( access_lists => [ { mode => "$ALLOW_MODE_DEFAULTS", protocol_ports => [] } ] ), #BUG 373018, always set allow-service to All
     );
     $self->check_error( fault_obj => $all_som );
 

@@ -18,7 +18,7 @@ my $selfip = iControl::Networking::SelfIP->new(protocol => 'https',
 				   traffic_groups => 'traffic-group-1',
 );
 
-my $db = iControl::Networking::DBVariable->new(protocol => 'https',
+my $db = iControl::Management::DBVariable->new(protocol => 'https',
                                    host => '10.3.72.33',
                                    username => 'admin',
                                    password => 'admin',

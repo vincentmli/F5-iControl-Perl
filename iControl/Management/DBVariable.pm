@@ -8,7 +8,7 @@
 #
 ###############################################################################
 
-package iControl::Networking::DBVariable;
+package iControl::Management::DBVariable;
 
 use strict;
 use warnings;
