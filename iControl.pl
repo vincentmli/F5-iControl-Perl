@@ -4,21 +4,38 @@ use warnings;
 
 use iControl;
 use iControl::Networking::SelfIP;
+use iControl::Networking::SelfIPPortLockdown;
+use iControl::Networking::SelfIPV2;
 use iControl::Networking::VLAN;
 use iControl::Management::DBVariable;
 
 #iControl OO module testing
 
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
+
+my $selfipv2 = iControl::Networking::SelfIPV2->new(protocol => 'https',
+                                   host => '10.3.72.33',
+                                   username => 'admin',
+                                   password => 'admin',
+                                #   floating_states => 'STATE_ENABLED',
+				#   traffic_groups => 'traffic-group-1',
+);
 
 my $selfip = iControl::Networking::SelfIP->new(protocol => 'https',
                                    host => '10.3.72.33',
                                    username => 'admin',
                                    password => 'admin',
-                                   floating_states => 'STATE_ENABLED',
-				   traffic_groups => 'traffic-group-1',
+#                                   floating_states => 'STATE_ENABLED',
 );
 
 my $db = iControl::Management::DBVariable->new(protocol => 'https',
+                                   host => '10.3.72.33',
+                                   username => 'admin',
+                                   password => 'admin',
+);
+
+my $portlock = iControl::Networking::SelfIPPortLockdown->new(protocol => 'https',
                                    host => '10.3.72.33',
                                    username => 'admin',
                                    password => 'admin',
@@ -28,16 +45,14 @@ my $unitid = $db->get_db_variable('Failover.UnitId');
 print "unit id $unitid\n";
 
 $selfip->delete_self_ip("10.2.72.35");
-#$selfip->delete_self_ip("selfiptest");
-#$selfip->set_self_ipv2("selfiptest", "int-esnet", "10.2.72.35", "255.255.0.0", 0);
-$selfip->set_self_ipv2("selfiptest", "int-esnet", "10.2.72.35", "255.255.0.0");
-#$selfip->set_self_ip("10.2.72.35", "int-esnet", "255.255.0.0", $unitid);
-#$selfip->set_self_ip("10.2.72.35", "int-esnet", "255.255.0.0");
+#$selfipv2->delete_self_ip("10.2.72.35");
+#$selfipv2->create("10.2.72.35", "int-esnet", "10.2.72.35", "255.255.0.0");
+$selfip->create("10.2.72.35", "int-esnet", "255.255.0.0");
 #$selfip->delete_self_ip("10.2.72.35");
-$selfip->add_allow_access_list("10.2.72.35");
-#$selfip->add_allow_access_listv2("selfiptest");
+$portlock->add_allow_access_list("10.2.72.35");
+#$selfipv2->add_allow_access_list("10.2.72.35");
 
-my @selfips = $selfip->get_self_ips();
+my @selfips = $selfipv2->get_list();
 
 print "$_\n" for @selfips;
 
