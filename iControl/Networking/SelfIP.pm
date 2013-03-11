@@ -14,14 +14,15 @@ iControl::Networking::SelfIP - iControl Networking SelfIP modules
 
 =head1 SYNOPSIS
 
-        my $iControl = iControl::Networking::SelfIP->new(protocol => 'https',
+        my $selfip = iControl::Networking::SelfIP->new(protocol => 'https',
                                    host => 'mgmt_ip',
                                    username => 'user',
                                    password => 'password',
+                                   floating_states => 'STATE_ENABLED',
 				   
 			);
 
-	$iControl->createv2($self_ips, $vlan_names, $addresses, $netmasks)
+	$selfip->create($self_ips, $vlan_names, $addresses, $netmasks)
 
 =head1 DESCRIPTION
 
@@ -85,6 +86,48 @@ sub new {
 	bless ( $self, $class); 
 	$self;
 }
+
+
+=head2 get_floating_states
+
+object floating_states attibute accessor to get selfips floating states 
+
+=cut
+
+sub get_floating_states {
+    my ( $self, $floating_states ) = @_;
+    if ( $floating_states eq 'floating_states' ){
+         my $fs = $self->{$floating_states};
+         return $fs;
+    } else {
+         carp(
+            " $floating_states is not valid attribute.\n".
+            " "
+        );
+    }
+}
+
+=head2 set_floating_states
+
+object floating_states attibute accessor to set selfips floating states 
+
+=cut
+
+sub set_floating_states {
+    my ( $self, $floating_states, $state ) = @_;
+    if ( $floating_states eq 'floating_states' and 
+         ( $state eq $STATE_DISABLED or $state eq $STATE_ENABLED )
+       ) {  
+            $self->{$floating_states} = $state || "$STATE_DISABLED";
+    }else {
+                 carp(
+            " either $floating_states is not valid attribute or $state is not valid $STATE_DISABLED or $STATE_ENABLED\n".
+            " "
+        );
+
+    }
+}
+
 
 
 =head2 get_list

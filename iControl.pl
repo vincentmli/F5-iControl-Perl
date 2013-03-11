@@ -52,22 +52,24 @@ my $vlan = iControl::Networking::VLAN->new(protocol => 'https',
 my $unitid = $db->get_db_variable('Failover.UnitId');
 print "unit id $unitid\n";
 
-#$selfip->delete_self_ip("10.2.72.35");
+$selfip->delete_self_ip("10.2.72.35");
 #$selfipv2->delete_self_ip("10.2.72.35");
 #$selfipv2->create("10.2.72.35", "int-esnet", "10.2.72.35", "255.255.0.0");
-#$selfip->create("10.2.72.35", "int-esnet", "255.255.0.0");
+$selfip->set_floating_states('floating_states', 'STATE_ENABLED');
+$selfip->create("10.2.72.35", "int-esnet", "255.255.0.0");
 #$selfip->delete_self_ip("10.2.72.35");
 #$portlock->add_allow_access_list("10.2.72.35");
 #$selfipv2->add_allow_access_list("10.2.72.35");
 
 #my @selfips = $selfipv2->get_list();
+my @selfips = $selfip->get_list();
 
-#print "$_\n" for @selfips;
-$vlan->delete_vlan("test");
-$vlan->create("test", "169", "trunk_test");
+print "$_\n" for @selfips;
+#$vlan->delete_vlan("test");
+#$vlan->create("test", "169", "trunk_test");
 #my @timeout = $vlan->get_failsafe_timeout("test3");
 #print "$_\n" for @timeout;
-my @vlans = $vlan->get_list;
-print "$_\n" for @vlans;
+#my @vlans = $vlan->get_list;
+#print "$_\n" for @vlans;
 
 
