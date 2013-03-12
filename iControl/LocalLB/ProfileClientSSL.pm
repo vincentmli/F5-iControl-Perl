@@ -29,9 +29,7 @@ my $keycert = iControl::LocalLB::ProfileClientSSL->new(protocol => 'https',
 
 =head1 DESCRIPTION
 
-iControl::LocalLB::ProfileClientSSL is a module to manage BIG-IP ProfileClientSSL configuration
-including list/create/delete/modify ProfileClientSSLs on BIG-IP
-
+The ProfileClientSSL interface enables you to manipulate a local load balancer's client SSL profile
 
 =head1 METHODS
 
@@ -75,6 +73,26 @@ sub new {
         $self;
 }
 
+=head2 create_v2
+
+Creates the specified client SSL profiles, using key and certificate file object names. 
+Certificate and key file objects are managed by the Management::KeyCertificate interface. 
+
+create($profile_names, $keys, $certs)
+
+=over 4
+
+=item - $profile_names: The client SSL profiles to create 
+
+=item - $keys: The certificate key file object names to be used by BIG-IP acting as an SSL server. 
+
+=item - $certs: The certificate file object names to be used by BIG-IP acting as an SSL server 
+
+=back
+
+=cut
+
+
 sub create_v2 {
     my ( $self, $profile_names, $keys, $certs ) = @_;
     my $default_flag = $self->{default_flag};
@@ -90,6 +108,20 @@ sub create_v2 {
 
 }
 
+=head2 delete_profile 
+
+Deletes the specified client SSL profiles
+
+delete_profile($profile_names)
+
+=over 4
+
+=item - $profile_names: The names of the client SSL profiles to delete 
+
+=back
+
+=cut
+
 sub delete_profile {
     my ( $self, $profile_names ) = @_;
     my $soap =
@@ -100,6 +132,20 @@ sub delete_profile {
     );
     $self->check_error( fault_obj => $all_som );
 }
+
+=head2 get_key_file_v2 
+
+Gets the names of the certificate key file objects used by BIG-IP acting as an SSL server for a set of client SSL profiles
+
+get_key_file_v2($profile_names)
+
+=over 4
+
+=item - $profile_names: The names of the client SSL profiles 
+
+=back
+
+=cut
 
 sub get_key_file_v2 {
     my ( $self, $profile_names ) = @_;
