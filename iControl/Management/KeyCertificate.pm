@@ -17,19 +17,12 @@ iControl::Management::KeyCertificate - iControl Networking KeyCertificate module
 my $keycert = iControl::Management::KeyCertificate->new(protocol => 'https',
                                    host => 'mgmt_ip',
                                    username => 'user',
-                                   password => 'password',);
+                                   password => 'password',
+                                   mode => 'MANAGEMENT_MODE_DEFAULT',);
 
 =over 4
 
-=item - member_type:			default to MEMBER_INTERFACE when not net,
-
-=item - tag_state:			default to MEMBER_TAGGED when not set,
-
-=item - failsafe_states:		default to STATE_DISABLED when not set,
-
-=item - timeouts:			default to 90 seconds when not set,
-
-=item - mac_masquerade_addresses:	default auto assigned,
+=item - mode:			default to MANAGEMENT_MODE_DEFAULT when not net,
 
 =back
 
@@ -87,6 +80,24 @@ sub new {
         $self;
 }
 
+
+=head2 key_import_from_pem 
+
+Imports/installs the specified keys from the given PEM-formatted data
+
+key_import_from_pem($key_ids, $pem_data)
+
+=over 4
+
+=item - $key_ids: The string identifications of the keys to import/install. 
+
+=item - $pem_data: The PEM-formatted data associated with the specified keys, read the whole key file in scalar string 
+
+=back
+
+=cut
+
+
 sub key_import_from_pem {
     my ( $self, $key_ids, $pem_data ) = @_;
     my $mode = $self->{mode};
@@ -103,6 +114,22 @@ sub key_import_from_pem {
     $self->check_error( fault_obj => $all_som );
 
 }
+
+=head2 certificate_import_from_pem 
+
+Imports/installs the specified certificates from the given PEM-formatted data
+
+certificate_import_from_pem($cert_ids, $pem_data)
+
+=over 4
+
+=item - $cert_ids: The string identifications of the certificates to import/install. 
+
+=item - $pem_data: The PEM-formatted data associated with the specified certificates, read the whole cert file in scalar string 
+
+=back
+
+=cut
 
 sub certificate_import_from_pem {
     my ( $self, $cert_ids, $pem_data ) = @_;
@@ -121,6 +148,20 @@ sub certificate_import_from_pem {
 
 }
 
+=head2 certificate_delete 
+
+Deletes/uninstalls the specified certificates
+
+certificate_delete($cert_ids)
+
+=over 4
+
+=item - $cert_ids: The string identifications of the certificates to delete/uninstall 
+
+=back
+
+=cut
+
 sub certificate_delete {
     my ( $self, $cert_ids ) = @_;
     my $mode = $self->{mode};
@@ -134,6 +175,20 @@ sub certificate_delete {
     $self->check_error( fault_obj => $all_som );
 }
 
+=head2 key_delete 
+
+Deletes/uninstalls the specified keys
+
+key_delete($key_ids)
+
+=over 4
+
+=item - $key_ids: The string identifications of the keys to delete/uninstall 
+
+=back
+
+=cut
+
 sub key_delete {
     my ( $self, $key_ids ) = @_;
     my $mode = $self->{mode};
@@ -146,6 +201,22 @@ sub key_delete {
     );
     $self->check_error( fault_obj => $all_som );
 }
+
+=head2 certificate_bind 
+
+Binds/associates the specified keys and certificates
+
+certificate_bind($cert_ids, $key_ids)
+
+=over 4
+
+=item - $cert_ids: The string identifications of the certificates 
+
+=item - $key_ids: The string identifications of the keys 
+
+=back
+
+=cut
 
 sub certificate_bind {
     my ( $self, $cert_ids, $key_ids ) = @_;
