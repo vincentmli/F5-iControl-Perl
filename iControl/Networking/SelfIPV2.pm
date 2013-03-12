@@ -99,7 +99,7 @@ sub new {
 
 =head2 get_list 
 
-get list of selfips from BIG-IP
+Gets a list of all self IPs on this device
 
 =cut
 
@@ -118,7 +118,7 @@ sub get_list {
 
 =head2 delete_all_self_ips
 
-deletes all self IP addresses
+Deletes all self IP addresses
 
 =cut
 
@@ -134,7 +134,7 @@ sub delete_all_self_ips {
 
 =head2 delete_self_ip
 
-deletes the specified self IP addresses 
+Deletes the specified self IP addresses
 
 delete_self_ip($selfip)
 
@@ -160,7 +160,7 @@ sub delete_self_ip {
 
 =head2 create
 
-create selfip on BIG-IP for TMOS 11.x.
+Creates the specified self IP addresses with extended attributes for TMOS 11.x.
 
 create($self_ips, $vlan_names, $addresses, $netmasks)
 
@@ -202,6 +202,22 @@ sub create {
 
 }
     
+=head2 add_allow_access_list 
+
+Adds the list of access methods, with optional protocols/ports, for the specified self IPs
+
+create($self_ips)
+
+default to allow default
+
+=over 4
+
+=item - $self_ips: The self IP name to add allow access 
+
+=back
+
+=cut
+
 sub add_allow_access_list {
 
     my ( $self, $self_ips ) = @_;

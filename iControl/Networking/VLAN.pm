@@ -104,7 +104,9 @@ sub new {
 
 =head2 get_list
 
-get list of  vlans on BIG-IP.
+Gets a list of all VLANs on this device
+
+get_list
 
 =cut
 
@@ -123,6 +125,21 @@ sub get_list {
         return @vlans;
 }
 
+=head2 get_failsafe_timeout 
+
+Gets the failsafe timeouts for the specified VLANs
+
+get_failsafe_timeout($vlans);
+
+=over 4
+
+=item - $vlans: vlan to get failsafe timeout 
+
+=back
+
+=cut
+
+
 sub get_failsafe_timeout {
 
     my ( $self, $vlans) = @_;
@@ -136,6 +153,27 @@ sub get_failsafe_timeout {
     my @timeouts = @{$all_som->result}; 
     return @timeouts
 }
+
+=head2 create 
+
+Creates the specified VLANs with extended attributes
+
+create($vlans, $vlan_ids, $member_name);
+
+=over 4
+
+=item - $vlans: The VLAN names 
+
+=item - $vlan_ids: The VLAN tag numbers or IDs (valid range is 1-4095). 
+
+=item - $member_name: the interface/trunk name, if add more than one interfaces/trunks
+        use this method to create the vlan with one interface,then use add_member method
+        to add more interfaces, this eliminate the the array of hash handliing complication  
+
+=back
+
+=cut
+
 
 sub create {
 
@@ -159,6 +197,20 @@ sub create {
     $self->check_error( fault_obj => $all_som );
 
 }
+
+=head2 delete_vlan 
+
+Deletes the specified VLANs
+
+delete($vlans);
+
+=over 4
+
+=item - $vlans: vlan to delete 
+
+=back
+
+=cut
 
 sub delete_vlan {
 
