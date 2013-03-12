@@ -83,8 +83,8 @@ sub create_v2 {
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->create_v2(
         SOAP::Data->name( profile_names        => [ $profile_names ] ),
-        SOAP::Data->name( keys      => [ { value => $keys, default_flag => $default_flag } ] ),
-        SOAP::Data->name( certs      => [ { value => $certs, default_flag => $default_flag } ] ),
+        SOAP::Data->name( keys      => [ { value => "$keys.key", default_flag => $default_flag } ] ),
+        SOAP::Data->name( certs      => [ { value => "$certs.crt", default_flag => $default_flag } ] ),
     );
     $self->check_error( fault_obj => $all_som );
 

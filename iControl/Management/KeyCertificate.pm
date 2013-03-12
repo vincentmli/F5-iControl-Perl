@@ -17,7 +17,7 @@ iControl::Management::KeyCertificate - iControl Networking KeyCertificate module
 my $keycert = iControl::Management::KeyCertificate->new(protocol => 'https',
                                    host => 'mgmt_ip',
                                    username => 'user',
-                                   password => 'password',
+                                   password => 'password',);
 
 =over 4
 
@@ -54,6 +54,7 @@ package iControl::Management::KeyCertificate;
 
 use strict;
 use warnings;
+use Carp;
 use iControl;
 
 use Exporter();
@@ -94,10 +95,10 @@ sub key_import_from_pem {
       SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->key_import_from_pem(
-        SOAP::Data->name( mode        => [ $mode ] ),
+        SOAP::Data->name( mode        =>  $mode  ),
         SOAP::Data->name( key_ids      => [ $key_ids ] ),
         SOAP::Data->name( pem_data      => [ $pem_data ] ),
-        SOAP::Data->name( overwrite  => [ $overwrite ] ),
+        SOAP::Data->name( overwrite  =>  $overwrite  ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -111,10 +112,10 @@ sub certificate_import_from_pem {
       SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->certificate_import_from_pem(
-        SOAP::Data->name( mode        => [ $mode ] ),
+        SOAP::Data->name( mode        =>  $mode  ),
         SOAP::Data->name( cert_ids      => [ $cert_ids ] ),
         SOAP::Data->name( pem_data      => [ $pem_data ] ),
-        SOAP::Data->name( overwrite  => [ $overwrite ] ),
+        SOAP::Data->name( overwrite  =>  $overwrite  ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -127,7 +128,7 @@ sub certificate_delete {
       SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->certificate_delete(
-        SOAP::Data->name( mode        => [ $mode ] ),
+        SOAP::Data->name( mode        =>  $mode  ),
         SOAP::Data->name( cert_ids      => [ $cert_ids ] ),
     );
     $self->check_error( fault_obj => $all_som );
@@ -140,7 +141,7 @@ sub key_delete {
       SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->key_delete(
-        SOAP::Data->name( mode        => [ $mode ] ),
+        SOAP::Data->name( mode        =>  $mode  ),
         SOAP::Data->name( key_ids      => [ $key_ids ] ),
     );
     $self->check_error( fault_obj => $all_som );
@@ -153,7 +154,7 @@ sub certificate_bind {
       SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->certificate_bind(
-        SOAP::Data->name( mode        => [ $mode ] ),
+        SOAP::Data->name( mode        =>  $mode  ),
         SOAP::Data->name( cert_ids      => [ $cert_ids ] ),
         SOAP::Data->name( key_ids      => [ $key_ids ] ),
     );
