@@ -26,6 +26,8 @@ if (  defined $name  and ! defined $value) {
 elsif ( defined $name and defined $value ) {
     if ($value eq "reset") {
        $db->reset($name);
+       my $result = $db->query($name);
+       print "$name:\t$result\n";
     }else {
       $db->modify( $name, $value );
       my $result = $db->query($name);
