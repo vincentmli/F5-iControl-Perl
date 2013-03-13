@@ -20,18 +20,15 @@ my $db = iControl::Management::DBVariable->new(
 );
 
 if (  defined $name  and ! defined $value) {
-    my $result = $db->query($name);
-    print "$name:\t$result\n";
+      show($name);
 }
 elsif ( defined $name and defined $value ) {
     if ($value eq "reset") {
        $db->reset($name);
-       my $result = $db->query($name);
-       print "$name:\t$result\n";
+       show($name);
     }else {
       $db->modify( $name, $value );
-      my $result = $db->query($name);
-      print "$name:\t$result\n";
+      show($name);
    }
 }
 else {
@@ -45,5 +42,11 @@ sub list {
         my $value = $dbkey->{value};
 	print "$name:$value\n";
     }
+}
+
+sub show {
+    my $name = shift;
+    my $result = $db->query($name);
+    print "$name:\t$result\n";
 }
 
