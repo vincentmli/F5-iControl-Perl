@@ -65,8 +65,15 @@ my $profile = iControl::LocalLB::ProfileClientSSL->new(protocol => 'https',
                                    password => 'admin',
 );
 
-my $unitid = $db->get_db_variable('Failover.UnitId');
+my $unitid = $db->query('Failover.UnitId');
 print "unit id $unitid\n";
+
+my @dbs = $db->get_list();
+foreach my $dbkey (@dbs) {
+  my $name = $dbkey->{name};
+  my $value = $dbkey->{value};
+  print "$name: $value\n";
+}
 
 #$selfip->delete_self_ip("10.2.72.35");
 #$selfipv2->delete_self_ip("10.2.72.35");
@@ -86,6 +93,8 @@ print "unit id $unitid\n";
 #print "$_\n" for @timeout;
 #my @vlans = $vlan->get_list;
 #print "$_\n" for @vlans;
+
+=for head
 
 my $cert = '/home/vincent/vli_self_server.crt';
 my $vli_self_cert_pem_data = do {
@@ -111,3 +120,5 @@ $keycert->certificate_import_from_pem("vli_self_server_cert", $vli_self_cert_pem
 $keycert->key_import_from_pem("vli_self_server_key", $vli_self_key_pem_data);
 $keycert->certificate_bind("vli_self_server_cert", "vli_self_server_key");
 $profile->create_v2('vli_self_server_clientssl', "vli_self_server_key", "vli_self_server_cert");
+
+=cut

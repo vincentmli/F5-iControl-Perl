@@ -81,7 +81,7 @@ sub new {
 
 	$self->{floating_states} .= $arguments{floating_states} || "$STATE_DISABLED";
 	my $db = iControl::Management::DBVariable->new(%arguments); 
-	$self->{unit_id} .= $db->get_db_variable('Failover.UnitId') || "$NON_FLOATING_UNIT_ID";
+	$self->{unit_id} .= $db->query('Failover.UnitId') || "$NON_FLOATING_UNIT_ID";
 
 	bless ( $self, $class); 
 	$self;

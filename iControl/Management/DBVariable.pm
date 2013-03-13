@@ -8,6 +8,38 @@
 #
 ###############################################################################
 
+=head1 NAME
+
+iControl::Management::DBVariable - iControl Networking KeyCertificate modules
+
+=head1 SYNOPSIS
+
+my $db = iControl::Management::DBVariable->new(protocol => 'https',
+                                   host => 'mgmt_ip',
+                                   username => 'user',
+                                   password => 'password',
+
+=over 4
+
+=back
+
+=cut
+
+=head1 DESCRIPTION
+
+iControl::Management::DBVariable exposes methods that enable you to work directly with our internal database 
+that contains configuration variables using name/value pairs
+
+
+=head1 METHODS
+
+=over 4
+
+=back
+
+=cut
+
+
 package iControl::Management::DBVariable;
 
 use strict;
@@ -29,33 +61,117 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 @EXPORT_OK   = qw();
 
 
-=head2 get_db_variable
+=head2 query 
 
-Get the value of a variable from BigIP's DB.
+Queries the values of the specified variables
 
-get_db_vairable($key)
+query($name)
 
 =over 4
 
-=item - $key: Get the value of db key $key
+=item - $name: The names of the database variables
 
 =back
 
 =cut
 
-sub get_db_variable {
-        my ($self, $key) = @_;
+sub query {
+        my ($self, $name) = @_;
         my $soap = SOAP::Lite
                 -> uri('urn:iControl:Management/DBVariable')
                 -> proxy($self->{_proxy})
         ;
 
         my $all_som = $soap->query(
-                                   SOAP::Data->name(variables => [$key])
+                                   SOAP::Data->name(variables => [$name])
                                   );
         $self->check_error(fault_obj => $all_som);
 
         return $all_som->result->[0]->{value};
+}
+
+=head2 modify 
+
+Modifies the specified variables in the database
+
+modify($name)
+
+=over 4
+
+=item - $name: The names of the database variables
+
+=back
+
+=cut
+
+sub modify {
+        my ($self, $name, $value) = @_;
+        my $soap = SOAP::Lite
+                -> uri('urn:iControl:Management/DBVariable')
+                -> proxy($self->{_proxy})
+        ;
+
+        my $all_som = $soap->modify(
+                                   SOAP::Data->name(variables => [ { name => $name, value => $value } ]),
+                                  );
+        $self->check_error(fault_obj => $all_som);
+
+}
+
+=head2 get_list 
+
+Retrieves the values of all variables defined in the database. This list can potentially be huge
+
+Return type: VariableNameValue [] 	The list of variable names/values.
+
+get_list()
+
+=over 4
+
+=back
+
+=cut
+
+sub get_list {
+        my ($self) = @_;
+        my $soap = SOAP::Lite
+                -> uri('urn:iControl:Management/DBVariable')
+                -> proxy($self->{_proxy})
+        ;
+
+        my $all_som = $soap->get_list();
+        $self->check_error(fault_obj => $all_som);
+	my @result = @{$all_som->result};
+	return @result;
+
+}
+
+=head2 reset 
+
+Resets the specified variables to their default values
+
+reset($name)
+
+=over 4
+
+=item - $name: Names of the database variables to modify 
+
+=back
+
+=cut
+
+sub reset {
+        my ($self, $name) = @_;
+        my $soap = SOAP::Lite
+                -> uri('urn:iControl:Management/DBVariable')
+                -> proxy($self->{_proxy})
+        ;
+
+        my $all_som = $soap->reset(
+                                   SOAP::Data->name(variables => [$name]),
+                                  );
+        $self->check_error(fault_obj => $all_som);
+
 }
 
 
