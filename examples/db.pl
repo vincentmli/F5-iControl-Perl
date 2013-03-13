@@ -28,6 +28,8 @@ elsif ( defined $name and defined $value ) {
        $db->reset($name);
     }else {
       $db->modify( $name, $value );
+      my $result = $db->query($name);
+      print "$name:\t$result\n";
    }
 }
 else {
