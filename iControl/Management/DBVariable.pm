@@ -39,7 +39,6 @@ that contains configuration variables using name/value pairs
 
 =cut
 
-
 package iControl::Management::DBVariable;
 
 use strict;
@@ -47,19 +46,18 @@ use warnings;
 use iControl;
 
 use Exporter();
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
 # using RCS tag for version
 $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 
 @ISA         = qw(iControl);
 @EXPORT      = ();
-%EXPORT_TAGS = ();     # eg: TAG => [ qw!name1 name2! ],
+%EXPORT_TAGS = ();             # eg: TAG => [ qw!name1 name2! ],
 
-    # exported package globals and
-    # optionally exported functions
-@EXPORT_OK   = qw();
-
+# exported package globals and
+# optionally exported functions
+@EXPORT_OK = qw();
 
 =head2 query 
 
@@ -76,18 +74,15 @@ query($name)
 =cut
 
 sub query {
-        my ($self, $name) = @_;
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:Management/DBVariable')
-                -> proxy($self->{_proxy})
-        ;
+    my ( $self, $name ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:Management/DBVariable')
+      ->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->query(
-                                   SOAP::Data->name(variables => [$name])
-                                  );
-        $self->check_error(fault_obj => $all_som);
+    my $all_som = $soap->query( SOAP::Data->name( variables => [$name] ) );
+    $self->check_error( fault_obj => $all_som );
 
-        return $all_som->result->[0]->{value};
+    return $all_som->result->[0]->{value};
 }
 
 =head2 modify 
@@ -105,16 +100,15 @@ modify($name)
 =cut
 
 sub modify {
-        my ($self, $name, $value) = @_;
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:Management/DBVariable')
-                -> proxy($self->{_proxy})
-        ;
+    my ( $self, $name, $value ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:Management/DBVariable')
+      ->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->modify(
-                                   SOAP::Data->name(variables => [ { name => $name, value => $value } ]),
-                                  );
-        $self->check_error(fault_obj => $all_som);
+    my $all_som = $soap->modify(
+        SOAP::Data->name( variables => [ { name => $name, value => $value } ] ),
+    );
+    $self->check_error( fault_obj => $all_som );
 
 }
 
@@ -133,16 +127,15 @@ get_list()
 =cut
 
 sub get_list {
-        my ($self) = @_;
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:Management/DBVariable')
-                -> proxy($self->{_proxy})
-        ;
+    my ($self) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:Management/DBVariable')
+      ->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->get_list();
-        $self->check_error(fault_obj => $all_som);
-	my @result = @{$all_som->result};
-	return @result;
+    my $all_som = $soap->get_list();
+    $self->check_error( fault_obj => $all_som );
+    my @result = @{ $all_som->result };
+    return @result;
 
 }
 
@@ -161,18 +154,14 @@ reset($name)
 =cut
 
 sub reset {
-        my ($self, $name) = @_;
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:Management/DBVariable')
-                -> proxy($self->{_proxy})
-        ;
+    my ( $self, $name ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:Management/DBVariable')
+      ->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->reset(
-                                   SOAP::Data->name(variables => [$name]),
-                                  );
-        $self->check_error(fault_obj => $all_som);
+    my $all_som = $soap->reset( SOAP::Data->name( variables => [$name] ), );
+    $self->check_error( fault_obj => $all_som );
 
 }
-
 
 1;

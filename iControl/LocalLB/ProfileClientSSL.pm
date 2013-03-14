@@ -39,7 +39,6 @@ The ProfileClientSSL interface enables you to manipulate a local load balancer's
 
 =cut
 
-
 package iControl::LocalLB::ProfileClientSSL;
 
 use strict;
@@ -47,30 +46,30 @@ use warnings;
 use iControl;
 
 use Exporter();
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
 # using RCS tag for version
 $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 
 @ISA         = qw(iControl);
 @EXPORT      = ();
-%EXPORT_TAGS = ();     # eg: TAG => [ qw!name1 name2! ],
+%EXPORT_TAGS = ();             # eg: TAG => [ qw!name1 name2! ],
 
-    # exported package globals and
-    # optionally exported functions
-@EXPORT_OK   = qw();
+# exported package globals and
+# optionally exported functions
+@EXPORT_OK = qw();
 
 my $DEFAULT_FLAG = 'false';
 
 sub new {
-        my ($class, %arguments) = @_;
-        $class = ref($class) || $class;
-        my $self = $class->SUPER::new(%arguments);
+    my ( $class, %arguments ) = @_;
+    $class = ref($class) || $class;
+    my $self = $class->SUPER::new(%arguments);
 
-        $self->{default_flag} = $arguments{default_flag} || "$DEFAULT_FLAG";
+    $self->{default_flag} = $arguments{default_flag} || "$DEFAULT_FLAG";
 
-        bless ( $self, $class);
-        $self;
+    bless( $self, $class );
+    $self;
 }
 
 =head2 create_v2
@@ -92,7 +91,6 @@ create($profile_names, $keys, $certs)
 
 =cut
 
-
 sub create_v2 {
     my ( $self, $profile_names, $keys, $certs ) = @_;
     my $default_flag = $self->{default_flag};
@@ -100,9 +98,14 @@ sub create_v2 {
       SOAP::Lite->uri('urn:iControl:LocalLB/ProfileClientSSL')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->create_v2(
-        SOAP::Data->name( profile_names        => [ $profile_names ] ),
-        SOAP::Data->name( keys      => [ { value => "$keys.key", default_flag => $default_flag } ] ),
-        SOAP::Data->name( certs      => [ { value => "$certs.crt", default_flag => $default_flag } ] ),
+        SOAP::Data->name( profile_names => [$profile_names] ),
+        SOAP::Data->name(
+            keys => [ { value => "$keys.key", default_flag => $default_flag } ]
+        ),
+        SOAP::Data->name(
+            certs =>
+              [ { value => "$certs.crt", default_flag => $default_flag } ]
+        ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -128,7 +131,7 @@ sub delete_profile {
       SOAP::Lite->uri('urn:iControl:LocalLB/ProfileClientSSL')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->delete_profile(
-        SOAP::Data->name( profile_names    => [ $profile_names ] ),
+        SOAP::Data->name( profile_names => [$profile_names] ),
     );
     $self->check_error( fault_obj => $all_som );
 }
@@ -153,13 +156,11 @@ sub get_key_file_v2 {
       SOAP::Lite->uri('urn:iControl:LocalLB/ProfileClientSSL')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->get_key_file_v2(
-        SOAP::Data->name( profile_names    => [ $profile_names ] ),
+        SOAP::Data->name( profile_names => [$profile_names] ),
     );
     $self->check_error( fault_obj => $all_som );
-    my @keys = @{$all_som->result};
+    my @keys = @{ $all_som->result };
     return @keys;
 }
-
-
 
 1;

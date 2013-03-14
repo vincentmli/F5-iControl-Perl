@@ -38,7 +38,6 @@ including list/create/delete/modify selfips on BIG-IP
 
 =cut
 
-
 package iControl::Networking::SelfIP;
 
 use strict;
@@ -61,8 +60,8 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 # optionally exported functions
 @EXPORT_OK = qw();
 
-my $STATE_DISABLED = "STATE_DISABLED";
-my $STATE_ENABLED  = "STATE_ENABLED";
+my $STATE_DISABLED       = "STATE_DISABLED";
+my $STATE_ENABLED        = "STATE_ENABLED";
 my $NON_FLOATING_UNIT_ID = '0';
 
 =head2 new 
@@ -71,22 +70,22 @@ constructor to bring a selfip object into life
 
 =cut
 
-
 sub new {
-        my ($class, %arguments) = @_; 
+    my ( $class, %arguments ) = @_;
 
-	$class = ref($class) || $class;
+    $class = ref($class) || $class;
 
-	my $self = $class->SUPER::new(%arguments);
+    my $self = $class->SUPER::new(%arguments);
 
-	$self->{floating_states} .= $arguments{floating_states} || "$STATE_DISABLED";
-	my $db = iControl::Management::DBVariable->new(%arguments); 
-	$self->{unit_id} .= $db->query('Failover.UnitId') || "$NON_FLOATING_UNIT_ID";
+    $self->{floating_states} .= $arguments{floating_states}
+      || "$STATE_DISABLED";
+    my $db = iControl::Management::DBVariable->new(%arguments);
+    $self->{unit_id} .= $db->query('Failover.UnitId')
+      || "$NON_FLOATING_UNIT_ID";
 
-	bless ( $self, $class); 
-	$self;
+    bless( $self, $class );
+    $self;
 }
-
 
 =head2 get_floating_states
 
@@ -96,14 +95,12 @@ object floating_states attibute accessor to get selfips floating states
 
 sub get_floating_states {
     my ( $self, $floating_states ) = @_;
-    if ( $floating_states eq 'floating_states' ){
-         my $fs = $self->{$floating_states};
-         return $fs;
-    } else {
-         carp(
-            " $floating_states is not valid attribute.\n".
-            " "
-        );
+    if ( $floating_states eq 'floating_states' ) {
+        my $fs = $self->{$floating_states};
+        return $fs;
+    }
+    else {
+        carp( " $floating_states is not valid attribute.\n" . " " );
     }
 }
 
@@ -115,20 +112,18 @@ object floating_states attibute accessor to set selfips floating states
 
 sub set_floating_states {
     my ( $self, $floating_states, $state ) = @_;
-    if ( $floating_states eq 'floating_states' and 
-         ( $state eq $STATE_DISABLED or $state eq $STATE_ENABLED )
-       ) {  
-            $self->{$floating_states} = $state || "$STATE_DISABLED";
-    }else {
-                 carp(
-            " either $floating_states is not valid attribute or $state is not valid $STATE_DISABLED or $STATE_ENABLED\n".
-            " "
-        );
+    if ( $floating_states eq 'floating_states'
+        and ( $state eq $STATE_DISABLED or $state eq $STATE_ENABLED ) )
+    {
+        $self->{$floating_states} = $state || "$STATE_DISABLED";
+    }
+    else {
+        carp(
+" either $floating_states is not valid attribute or $state is not valid $STATE_DISABLED or $STATE_ENABLED\n"
+              . " " );
 
     }
 }
-
-
 
 =head2 get_list
 
@@ -180,14 +175,13 @@ delete_self_ip($selfip)
 =cut
 
 sub delete_self_ip {
-    my ($self, $selfip) = @_;
+    my ( $self, $selfip ) = @_;
     my $soap =
       SOAP::Lite->uri('urn:iControl:Networking/SelfIP')
       ->proxy( $self->{_proxy} );
 
-    my $all_som = $soap->delete_self_ip(
-	SOAP::Data->name( self_ips => [ "$selfip" ])
-    );
+    my $all_som =
+      $soap->delete_self_ip( SOAP::Data->name( self_ips => ["$selfip"] ) );
     $self->check_error( fault_obj => $all_som );
 }
 
@@ -209,12 +203,12 @@ create($self_ips, $vlan_names, $netmasks, $unitid)
 
 =cut
 
-
 sub create {
 
     my ( $self, $self_ips, $vlan_names, $netmasks ) = @_;
     my $float = $self->{floating_states};
-    my $uid   = $float eq $STATE_ENABLED ? "$self->{unit_id}"  : $NON_FLOATING_UNIT_ID;
+    my $uid =
+      $float eq $STATE_ENABLED ? "$self->{unit_id}" : $NON_FLOATING_UNIT_ID;
     my $soap =
       SOAP::Lite->uri('urn:iControl:Networking/SelfIP')
       ->proxy( $self->{_proxy} );

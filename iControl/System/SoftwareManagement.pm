@@ -50,7 +50,6 @@ iControl::System::SoftwareManagement is a class to manage BIG-IP Software
 
 =cut
 
-
 package iControl::System::SoftwareManagement;
 
 use strict;
@@ -59,38 +58,38 @@ use Carp;
 use iControl;
 
 use Exporter();
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
 # using RCS tag for version
 $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 
 @ISA         = qw(iControl);
 @EXPORT      = ();
-%EXPORT_TAGS = ();     # eg: TAG => [ qw!name1 name2! ],
+%EXPORT_TAGS = ();             # eg: TAG => [ qw!name1 name2! ],
 
-    # exported package globals and
-    # optionally exported functions
-@EXPORT_OK   = qw();
+# exported package globals and
+# optionally exported functions
+@EXPORT_OK = qw();
 
-my $DEFAULT_PRODUCT = 'BIGIP';
+my $DEFAULT_PRODUCT       = 'BIGIP';
 my $DEFAULT_CREATE_VOLUME = 'false';
-my $DEFAULT_REBOOT = 'false';
-my $DEFAULT_RETRY = 'false';
+my $DEFAULT_REBOOT        = 'false';
+my $DEFAULT_RETRY         = 'false';
 
 sub new {
-        my ($class, %arguments) = @_;
-        $class = ref($class) || $class;
-        my $self = $class->SUPER::new(%arguments);
+    my ( $class, %arguments ) = @_;
+    $class = ref($class) || $class;
+    my $self = $class->SUPER::new(%arguments);
 
-        $self->{product} = $arguments{product} || "$DEFAULT_PRODUCT";
-        $self->{create_volume} = $arguments{create_volume} || "$DEFAULT_CREATE_VOLUME";
-        $self->{reboot} = $arguments{reboot} || "$DEFAULT_REBOOT";
-        $self->{retry} = $arguments{retry} || "$DEFAULT_RETRY";
+    $self->{product} = $arguments{product} || "$DEFAULT_PRODUCT";
+    $self->{create_volume} = $arguments{create_volume}
+      || "$DEFAULT_CREATE_VOLUME";
+    $self->{reboot} = $arguments{reboot} || "$DEFAULT_REBOOT";
+    $self->{retry}  = $arguments{retry}  || "$DEFAULT_RETRY";
 
-        bless ( $self, $class);
-        $self;
+    bless( $self, $class );
+    $self;
 }
-
 
 =head2 install_software_image 
 
@@ -110,7 +109,6 @@ install_software_image($install_volume, $product, $version, $build)
 
 =cut
 
-
 sub install_software_image {
     my ( $self, $install_volume, $version, $build ) = @_;
     my $product = $self->{product};
@@ -118,10 +116,10 @@ sub install_software_image {
       SOAP::Lite->uri('urn:iControl:System/SoftwareManagement')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->install_software_image(
-        SOAP::Data->name( install_volume    =>  $install_volume  ),
-        SOAP::Data->name( product      =>  $product  ),
-        SOAP::Data->name( version      =>  $version  ),
-        SOAP::Data->name( build  =>  $build  ),
+        SOAP::Data->name( install_volume => $install_volume ),
+        SOAP::Data->name( product        => $product ),
+        SOAP::Data->name( version        => $version ),
+        SOAP::Data->name( build          => $build ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -147,21 +145,21 @@ install_software_image_v2($install_volume, $product, $version, $build)
 
 sub install_software_image_v2 {
     my ( $self, $install_volume, $version, $build ) = @_;
-    my $product = $self->{product};
+    my $product       = $self->{product};
     my $create_volume = $self->{create_volume};
-    my $reboot = $self->{reboot};
-    my $retry = $self->{retry};
+    my $reboot        = $self->{reboot};
+    my $retry         = $self->{retry};
     my $soap =
       SOAP::Lite->uri('urn:iControl:System/SoftwareManagement')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->install_software_image_v2(
-        SOAP::Data->name( install_volume    =>  $install_volume  ),
-        SOAP::Data->name( product      =>  $product  ),
-        SOAP::Data->name( version      =>  $version  ),
-        SOAP::Data->name( build  =>  $build  ),
-        SOAP::Data->name( create_volume  =>  $create_volume  ),
-        SOAP::Data->name( reboot  =>  $reboot  ),
-        SOAP::Data->name( retry  =>  $retry  ),
+        SOAP::Data->name( install_volume => $install_volume ),
+        SOAP::Data->name( product        => $product ),
+        SOAP::Data->name( version        => $version ),
+        SOAP::Data->name( build          => $build ),
+        SOAP::Data->name( create_volume  => $create_volume ),
+        SOAP::Data->name( reboot         => $reboot ),
+        SOAP::Data->name( retry          => $retry ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -187,9 +185,8 @@ sub set_boot_location {
     my $soap =
       SOAP::Lite->uri('urn:iControl:System/SoftwareManagement')
       ->proxy( $self->{_proxy} );
-    my $all_som = $soap->set_boot_location(
-        SOAP::Data->name( location  =>  $location  ),
-    );
+    my $all_som =
+      $soap->set_boot_location( SOAP::Data->name( location => $location ), );
     $self->check_error( fault_obj => $all_som );
 
 }
@@ -215,11 +212,10 @@ sub set_cluster_boot_location {
       SOAP::Lite->uri('urn:iControl:System/SoftwareManagement')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->set_cluster_boot_location(
-        SOAP::Data->name( location  =>  $location  ),
+        SOAP::Data->name( location => $location ),
     );
     $self->check_error( fault_obj => $all_som );
 
 }
-
 
 1;
