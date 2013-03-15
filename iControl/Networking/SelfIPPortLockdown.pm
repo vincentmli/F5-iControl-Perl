@@ -33,7 +33,6 @@ iControl::Networking::SelfIPPortLockdown enables you to lock down protocols and 
 
 =cut
 
-
 package iControl::Networking::SelfIPPortLockdown;
 
 use strict;
@@ -55,12 +54,11 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 # optionally exported functions
 @EXPORT_OK = qw();
 
-my $ALLOW_MODE_PROTOCOL_PORT = 'ALLOW_MODE_PROTOCOL_PORT';
-my $ALLOW_MODE_DEFAULTS = 'ALLOW_MODE_DEFAULTS';
-my $PROTOCOL_ANY = 'PROTOCOL_ANY';
-my $ALLOW_MODE_NONE = 'ALLOW_MODE_NONE';
+my $ALLOW_MODE_PROTOCOL_PORT  = 'ALLOW_MODE_PROTOCOL_PORT';
+my $ALLOW_MODE_DEFAULTS       = 'ALLOW_MODE_DEFAULTS';
+my $PROTOCOL_ANY              = 'PROTOCOL_ANY';
+my $ALLOW_MODE_NONE           = 'ALLOW_MODE_NONE';
 my $ALLOW_MODE_PROTOCOL_PORTa = 'ALLOW_MODE_PROTOCOL_PORT';
-
 
 =head2 new 
 
@@ -68,16 +66,15 @@ constructor to bring a selfip object into life
 
 =cut
 
-
 sub new {
-        my ($class, %arguments) = @_; 
+    my ( $class, %arguments ) = @_;
 
-	$class = ref($class) || $class;
+    $class = ref($class) || $class;
 
-	my $self = $class->SUPER::new(%arguments);
+    my $self = $class->SUPER::new(%arguments);
 
-	bless ( $self, $class); 
-	$self;
+    bless( $self, $class );
+    $self;
 }
 
 sub add_allow_access_list {
@@ -87,7 +84,15 @@ sub add_allow_access_list {
       SOAP::Lite->uri('urn:iControl:Networking/SelfIPPortLockdown')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->add_allow_access_list(
-        SOAP::Data->name( access_lists => [ { self_ip   => "$self_ips", mode =>  'ALLOW_MODE_DEFAULTS', protocol_ports =>  [ ]} ] ),
+        SOAP::Data->name(
+            access_lists => [
+                {
+                    self_ip        => "$self_ips",
+                    mode           => 'ALLOW_MODE_DEFAULTS',
+                    protocol_ports => []
+                }
+            ]
+        ),
     );
     $self->check_error( fault_obj => $all_som );
 

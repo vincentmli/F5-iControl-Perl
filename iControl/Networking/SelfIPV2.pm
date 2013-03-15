@@ -39,7 +39,6 @@ including list/create/delete/modify selfips on BIG-IP
 
 =cut
 
-
 package iControl::Networking::SelfIPV2;
 
 use strict;
@@ -61,18 +60,17 @@ $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 # optionally exported functions
 @EXPORT_OK = qw();
 
-my $STATE_DISABLED = "STATE_DISABLED";
-my $STATE_ENABLED  = "STATE_ENABLED";
+my $STATE_DISABLED           = "STATE_DISABLED";
+my $STATE_ENABLED            = "STATE_ENABLED";
 my $TRAFFIC_GROUP_LOCAL_ONLY = "traffic-group-local-only";
-my $TRAFFIC_GROUP_1 = "traffic-group-1";
-my $NON_FLOATING_UNIT_ID = '0';
+my $TRAFFIC_GROUP_1          = "traffic-group-1";
+my $NON_FLOATING_UNIT_ID     = '0';
 
-my $ALLOW_MODE_PROTOCOL_PORT = 'ALLOW_MODE_PROTOCOL_PORT';
-my $ALLOW_MODE_DEFAULTS = 'ALLOW_MODE_DEFAULTS';
-my $PROTOCOL_ANY = 'PROTOCOL_ANY';
-my $ALLOW_MODE_NONE = 'ALLOW_MODE_NONE';
+my $ALLOW_MODE_PROTOCOL_PORT  = 'ALLOW_MODE_PROTOCOL_PORT';
+my $ALLOW_MODE_DEFAULTS       = 'ALLOW_MODE_DEFAULTS';
+my $PROTOCOL_ANY              = 'PROTOCOL_ANY';
+my $ALLOW_MODE_NONE           = 'ALLOW_MODE_NONE';
 my $ALLOW_MODE_PROTOCOL_PORTa = 'ALLOW_MODE_PROTOCOL_PORT';
-
 
 =head2 new 
 
@@ -80,22 +78,21 @@ constructor to bring a selfip object into life
 
 =cut
 
-
 sub new {
-        my ($class, %arguments) = @_; 
+    my ( $class, %arguments ) = @_;
 
-	$class = ref($class) || $class;
+    $class = ref($class) || $class;
 
-	my $self = $class->SUPER::new(%arguments);
+    my $self = $class->SUPER::new(%arguments);
 
-	$self->{floating_states} .= $arguments{floating_states} || "$STATE_DISABLED";
-	$self->{traffic_groups} .= $arguments{traffic_groups} || "$TRAFFIC_GROUP_LOCAL_ONLY";
+    $self->{floating_states} .= $arguments{floating_states}
+      || "$STATE_DISABLED";
+    $self->{traffic_groups} .= $arguments{traffic_groups}
+      || "$TRAFFIC_GROUP_LOCAL_ONLY";
 
-
-	bless ( $self, $class); 
-	$self;
+    bless( $self, $class );
+    $self;
 }
-
 
 =head2 get_list 
 
@@ -147,14 +144,13 @@ delete_self_ip($selfip)
 =cut
 
 sub delete_self_ip {
-    my ($self, $selfip) = @_;
+    my ( $self, $selfip ) = @_;
     my $soap =
       SOAP::Lite->uri('urn:iControl:Networking/SelfIPV2')
       ->proxy( $self->{_proxy} );
 
-    my $all_som = $soap->delete_self_ip(
-	SOAP::Data->name( self_ips => [ "$selfip" ])
-    );
+    my $all_som =
+      $soap->delete_self_ip( SOAP::Data->name( self_ips => ["$selfip"] ) );
     $self->check_error( fault_obj => $all_som );
 }
 
@@ -181,11 +177,10 @@ traffic_groups attributes can be specified in constructor.
 
 =cut
 
-
 sub create {
 
     my ( $self, $self_ips, $vlan_names, $addresses, $netmasks ) = @_;
-    my $tg = $self->{traffic_groups};
+    my $tg    = $self->{traffic_groups};
     my $float = $self->{floating_states};
     my $soap =
       SOAP::Lite->uri('urn:iControl:Networking/SelfIPV2')
@@ -201,7 +196,7 @@ sub create {
     $self->check_error( fault_obj => $all_som );
 
 }
-    
+
 =head2 add_allow_access_list 
 
 Adds the list of access methods, with optional protocols/ports, for the specified self IPs
@@ -225,8 +220,11 @@ sub add_allow_access_list {
       SOAP::Lite->uri('urn:iControl:Networking/SelfIPV2')
       ->proxy( $self->{_proxy} );
     my $all_som = $soap->add_allow_access_list(
-        SOAP::Data->name( self_ips        => ["$self_ips"] ),
-        SOAP::Data->name( access_lists => [ { mode => "$ALLOW_MODE_DEFAULTS", protocol_ports => [] } ] ), #BUG 373018, always set allow-service to All
+        SOAP::Data->name( self_ips => ["$self_ips"] ),
+        SOAP::Data->name(
+            access_lists =>
+              [ { mode => "$ALLOW_MODE_DEFAULTS", protocol_ports => [] } ]
+        ),    #BUG 373018, always set allow-service to All
     );
     $self->check_error( fault_obj => $all_som );
 

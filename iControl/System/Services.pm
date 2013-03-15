@@ -41,7 +41,6 @@ SOD.... This interface does not support transactions
 
 =cut
 
-
 package iControl::System::Services;
 
 use strict;
@@ -49,33 +48,32 @@ use warnings;
 use iControl;
 
 use Exporter();
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
 # using RCS tag for version
 $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 
 @ISA         = qw(iControl);
 @EXPORT      = ();
-%EXPORT_TAGS = ();     # eg: TAG => [ qw!name1 name2! ],
+%EXPORT_TAGS = ();             # eg: TAG => [ qw!name1 name2! ],
 
-    # exported package globals and
-    # optionally exported functions
-@EXPORT_OK   = qw();
+# exported package globals and
+# optionally exported functions
+@EXPORT_OK = qw();
 
 my $STATE_DISABLED = 'STATE_DISABLED';
-my $STATE_ENABLED = 'STATE_ENABLED';
+my $STATE_ENABLED  = 'STATE_ENABLED';
 
 sub new {
-        my ($class, %arguments) = @_;
-        $class = ref($class) || $class;
-        my $self = $class->SUPER::new(%arguments);
+    my ( $class, %arguments ) = @_;
+    $class = ref($class) || $class;
+    my $self = $class->SUPER::new(%arguments);
 
-        $self->{state} = $arguments{state} || "$STATE_DISABLED";
+    $self->{state} = $arguments{state} || "$STATE_DISABLED";
 
-        bless ( $self, $class);
-        $self;
+    bless( $self, $class );
+    $self;
 }
-
 
 =head2 set_ssh_access_v2 
 
@@ -92,17 +90,17 @@ set_ssh_access_v2($addresses_ref)
 =cut
 
 sub set_ssh_access_v2 {
-        my ($self, $addresses_ref) = @_;
-	my $state = $self->{state};
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:System/Services')
-                -> proxy($self->{_proxy})
-        ;
+    my ( $self, $addresses_ref ) = @_;
+    my $state = $self->{state};
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:System/Services')->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->set_ssh_access_v2(
-                                   SOAP::Data->name(access => { state => $state, addresses => [ @{$addresses_ref} ] } )
-                                  );
-        $self->check_error(fault_obj => $all_som);
+    my $all_som = $soap->set_ssh_access_v2(
+        SOAP::Data->name(
+            access => { state => $state, addresses => [ @{$addresses_ref} ] }
+        )
+    );
+    $self->check_error( fault_obj => $all_som );
 
 }
 
@@ -122,18 +120,14 @@ reboot_system($seconds_to_reboot)
 =cut
 
 sub reboot_system {
-        my ($self, $seconds_to_reboot) = @_;
-        my $soap = SOAP::Lite
-                -> uri('urn:iControl:System/Services')
-                -> proxy($self->{_proxy})
-        ;
+    my ( $self, $seconds_to_reboot ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:System/Services')->proxy( $self->{_proxy} );
 
-        my $all_som = $soap->reboot_system(
-                                   SOAP::Data->name(seconds_to_reboot => $seconds_to_reboot )
-                                  );
-        $self->check_error(fault_obj => $all_som);
+    my $all_som = $soap->reboot_system(
+        SOAP::Data->name( seconds_to_reboot => $seconds_to_reboot ) );
+    $self->check_error( fault_obj => $all_som );
 
 }
-
 
 1;
