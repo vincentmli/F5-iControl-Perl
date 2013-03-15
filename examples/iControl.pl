@@ -7,6 +7,8 @@ BEGIN {
 }
 
 use iControl;
+use iControl::LocalLB;
+=for head
 use iControl::Networking::SelfIP;
 use iControl::Networking::SelfIPPortLockdown;
 use iControl::Networking::SelfIPV2;
@@ -14,6 +16,7 @@ use iControl::Networking::VLAN;
 use iControl::Management::DBVariable;
 use iControl::Management::KeyCertificate;
 use iControl::LocalLB::ProfileClientSSL;
+=cut
 use iControl::LocalLB::Pool;
 
 #iControl OO module testing
@@ -137,5 +140,9 @@ my @memberDefA;
 push @memberDefA, $member1;
 push @memberDefA, $member2;
 
+my $monitor_templates = "tcp";
+
+#$pool->delete_pool("pool_test");
 #$pool->create_v2("pool_test", 'LB_METHOD_ROUND_ROBIN', \@memberDefA);
-$pool->set_lb_method("pool_test", 'LB_METHOD_RATIO_MEMBER');
+$pool->set_monitor_association("pool_test",$monitor_templates); 
+#$pool->set_lb_method("pool_test", 'LB_METHOD_RATIO_MEMBER');

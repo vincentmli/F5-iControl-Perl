@@ -41,38 +41,36 @@ add members to a pool, delete members from a pool, find out the load balancing m
 
 =cut
 
-
 package iControl::LocalLB::Pool;
 
 use strict;
 use warnings;
 use iControl;
+use iControl::LocalLB;
 
 use Exporter();
-our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
+our ( $VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS );
 
 # using RCS tag for version
 $VERSION = sprintf "%d", q$Revision: #1 $ =~ /(\d+)/g;
 
-@ISA         = qw(iControl);
+@ISA         = qw(iControl::LocalLB);
 @EXPORT      = ();
-%EXPORT_TAGS = ();     # eg: TAG => [ qw!name1 name2! ],
+%EXPORT_TAGS = ();                      # eg: TAG => [ qw!name1 name2! ],
 
-    # exported package globals and
-    # optionally exported functions
-@EXPORT_OK   = qw();
+# exported package globals and
+# optionally exported functions
+@EXPORT_OK = qw();
 
 my $DEFAULT_FLAG = 'false';
 
 sub new {
-        my ($class, %arguments) = @_;
-        $class = ref($class) || $class;
-        my $self = $class->SUPER::new(%arguments);
+    my ( $class, %arguments ) = @_;
+    $class = ref($class) || $class;
+    my $self = $class->SUPER::new(%arguments);
 
-        $self->{default_flag} = $arguments{default_flag} || "$DEFAULT_FLAG";
-
-        bless ( $self, $class);
-        $self;
+    bless( $self, $class );
+    $self;
 }
 
 =head2 create_v2
@@ -95,16 +93,14 @@ https://devcentral.f5.com/wiki/iControl.LocalLB__Pool__create_v2.ashx
 
 =cut
 
-
 sub create_v2 {
     my ( $self, $pool_names, $lb_methods, $members_ref ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->create_v2(
-        SOAP::Data->name( pool_names        => [ $pool_names ] ),
-        SOAP::Data->name( lb_methods      => [ $lb_methods ] ),
-        SOAP::Data->name( members      => [ [ @{$members_ref} ] ] ),
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( lb_methods => [$lb_methods] ),
+        SOAP::Data->name( members    => [ [ @{$members_ref} ] ] ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -124,15 +120,12 @@ delete($pool_names)
 
 =cut
 
-
 sub delete_pool {
     my ( $self, $pool_names ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
-    my $all_som = $soap->delete_pool(
-        SOAP::Data->name( pool_names        => [ $pool_names ] ),
-    );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+    my $all_som =
+      $soap->delete_pool( SOAP::Data->name( pool_names => [$pool_names] ), );
     $self->check_error( fault_obj => $all_som );
 
 }
@@ -152,8 +145,7 @@ delete_all_pools()
 sub delete_all_pools {
     my ( $self, $pool_names ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->delete_all_pools();
     $self->check_error( fault_obj => $all_som );
 
@@ -180,11 +172,10 @@ https://devcentral.f5.com/wiki/iControl.LocalLB__Pool__set_lb_method.ashx
 sub set_lb_method {
     my ( $self, $pool_names, $lb_methods ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->set_lb_method(
-        SOAP::Data->name( pool_names        => [ $pool_names ] ),
-        SOAP::Data->name( lb_methods        => [ $lb_methods ] ),
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( lb_methods => [$lb_methods] ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -205,11 +196,10 @@ set_minimum_up_member($pool_names, $values)
 sub set_minimum_up_member {
     my ( $self, $pool_names, $values ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->set_minimum_up_member(
-        SOAP::Data->name( pool_names        => [ $pool_names ] ),
-        SOAP::Data->name( values        => [ $values ] ),
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( values     => [$values] ),
     );
     $self->check_error( fault_obj => $all_som );
 
@@ -236,11 +226,50 @@ https://devcentral.f5.com/wiki/iControl.Common__HAAction.ashx
 sub set_minimum_up_member_action {
     my ( $self, $pool_names, $actions ) = @_;
     my $soap =
-      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')
-      ->proxy( $self->{_proxy} );
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->set_minimum_up_member_action(
-        SOAP::Data->name( pool_names        => [ $pool_names ] ),
-        SOAP::Data->name( actions        => [ $actions ] ),
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( actions    => [$actions] ),
+    );
+    $self->check_error( fault_obj => $all_som );
+
+}
+
+=head2 set_monitor_association
+
+Sets/creates the monitor associations for the specified pools. This basically creates the monitor associations between a pool and a monitor rule
+
+set_monitor_association($pool_names, $monitor_templates)
+
+=over 4
+
+=item - $pool_names: The names of the pools
+
+=item - $monitor_templates: The monitor templates that will be used to evaluate the specified pools, pass in array ref 
+
+=back
+
+=cut
+
+sub set_monitor_association {
+    my ( $self, $pool_names, $monitor_templates ) = @_;
+    my $monitorrule_type   = $self->{monitorrule_type};
+    my $monitorrule_quorum = $self->{monitorrule_quorum};
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+    my $all_som = $soap->set_monitor_association(
+        SOAP::Data->name(
+            monitor_associations => [
+                {
+                    pool_name    => $pool_names,
+                    monitor_rule => {
+                        type              => $monitorrule_type,
+                        quorum            => $monitorrule_quorum,
+                        monitor_templates => [$monitor_templates],
+                    }
+                }
+            ]
+        ),
     );
     $self->check_error( fault_obj => $all_som );
 
