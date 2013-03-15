@@ -14,9 +14,11 @@ use iControl::Networking::VLAN;
 use iControl::Management::DBVariable;
 use iControl::Management::KeyCertificate;
 use iControl::LocalLB::ProfileClientSSL;
+use iControl::LocalLB::Pool;
 
 #iControl OO module testing
 
+=for head
 
 my $selfipv2 = iControl::Networking::SelfIPV2->new(protocol => 'https',
                                    host => '10.3.72.33',
@@ -64,16 +66,13 @@ my $profile = iControl::LocalLB::ProfileClientSSL->new(protocol => 'https',
                                    username => 'admin',
                                    password => 'admin',
 );
+=cut
+my $pool = iControl::LocalLB::Pool->new(protocol => 'https',
+                                   host => '172.24.12.46',
+                                   username => 'admin',
+                                   password => 'admin',
+);
 
-my $unitid = $db->query('Failover.UnitId');
-print "unit id $unitid\n";
-
-my @dbs = $db->get_list();
-foreach my $dbkey (@dbs) {
-  my $name = $dbkey->{name};
-  my $value = $dbkey->{value};
-  print "$name: $value\n";
-}
 
 #$selfip->delete_self_ip("10.2.72.35");
 #$selfipv2->delete_self_ip("10.2.72.35");
@@ -122,3 +121,21 @@ $keycert->certificate_bind("vli_self_server_cert", "vli_self_server_key");
 $profile->create_v2('vli_self_server_clientssl', "vli_self_server_key", "vli_self_server_cert");
 
 =cut
+
+my $member1 = {
+    address => '10.2.72.139',
+    port => '80',
+};
+
+my $member2 = {
+    address => '10.2.72.138',
+    port => '80',
+};
+
+my @memberDefA;
+
+push @memberDefA, $member1;
+push @memberDefA, $member2;
+
+#$pool->create_v2("pool_test", 'LB_METHOD_ROUND_ROBIN', \@memberDefA);
+$pool->set_lb_method("pool_test", 'LB_METHOD_RATIO_MEMBER');
