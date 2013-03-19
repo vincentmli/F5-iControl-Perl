@@ -229,4 +229,33 @@ sub certificate_bind {
     $self->check_error( fault_obj => $all_som );
 }
 
+
+=head2 get_key_list
+
+Gets the list of all installed keys and their information
+
+get_key_list()
+
+https://devcentral.f5.com/wiki/iControl.Management__KeyCertificate__KeyInformation.ashx
+KeyInformation [] 	The list of keys and their information. 
+
+=over 4
+
+=back
+
+=cut
+
+sub get_key_list {
+    my ( $self, $cert_ids, $key_ids ) = @_;
+    my $mode = $self->{mode};
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:Management/KeyCertificate')
+      ->proxy( $self->{_proxy} );
+    my $all_som = $soap->get_key_list(
+	SOAP::Data->name( mode     => $mode ),
+    );
+    $self->check_error( fault_obj => $all_som );
+    return $all_som->result;
+}
+
 1;
