@@ -9,7 +9,7 @@
 
 =head1 NAME
 
-iControl::LocalLB::LocalLB - iControl LocalLB LocalLB  modules
+iControl::LocalLB - iControl LocalLB  modules
 
 =head1 SYNOPSIS
 
