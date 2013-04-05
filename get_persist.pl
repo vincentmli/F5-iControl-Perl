@@ -172,14 +172,18 @@ sub PersistR() {
             if ( exists $node{$persistence_value} ) {
 
                 if ( $node{$persistence_value} ne $address ) {
-
-#                        doDebug("New record: client ip: $persistence_value node: $address create_time: $create_time age: $age\n");
                     doDebug(
 "ALARM: client ip: $persistence_value persist record: $node{$persistence_value}, $address\n"
                     );
+                    my $cmd =
+"/usr/bin/tmsh delete ltm persistence persist-records virtual $virtualname node-addr $address";
+                    system $cmd;
+                    doDebug(
+"client ip: $persistence_value persist record: $address deleted \n"
+                    );
 
 #print "client ip: $persistence_value persist record: $node{$persistence_value}, $address\n";
-                    exit(1);
+#		exit(1);
                 }
 
             }
@@ -192,14 +196,14 @@ sub PersistR() {
 
         }
 
+    }
+
 #clear the hash after each get_persistence_record run to fix the bug of false two records
-# because if not doing so, the first found persist record stays in the hash memory and
+# because if not doing so, the first found persist record stays in the hash memory, when it marked down
 #a second new persist record of course not the same as the first one, thus false alarm
 
-        for ( keys %node ) {
-            delete $node{$_};
-        }
-
+    for ( keys %node ) {
+        delete $node{$_};
     }
 
 }
@@ -222,9 +226,10 @@ while (1) {
     print "time: $localtime, microseconds: $microseconds\n\n";
 
     &PersistR( "127.0.0.1", "$virtualname" );
-    usleep(100);
 
-    #sleep(5);
+#usleep(100); # !!!please only sleep 100 microsecond in test, not in production. it slow down all tmm processes
+
+    sleep(5);
 
 }
 
