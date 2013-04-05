@@ -5,6 +5,7 @@ use SOAP::Lite;
 use MIME::Base64;
 use Sys::Syslog;
 use POSIX qw(strftime);
+use Getopt::Long;
 
 my $PID_FILE = "/var/run/get_persist.pid";
 my $program  = "GET_PERSIST";
@@ -55,11 +56,13 @@ my $sProtocol = "https";
 # Validate Arguments, customer change end
 #----------------------------------------------------------------------------
 
-my $virtualname = $ARGV[0];
+my @virtualnames;
 
-if ( $virtualname eq "" ) {
-    die("Usage: $0 virtualname\n");
-}
+GetOptions( "virtual|v=s" => \@virtualnames, );
+
+@virtualnames = split( /,/, join( ',', @virtualnames ) );
+
+usage() unless defined @virtualnames;
 
 # the debug log variable is a bit mask
 # debug = 0 NO LOGGING
@@ -69,6 +72,10 @@ if ( $virtualname eq "" ) {
 use constant DEBUG_STDOUT => 1;
 use constant DEBUG_SYSLOG => 2;
 my $debug = 2;
+
+sub usage {
+    print " $0 -v virtualname\n";
+}
 
 sub doDebug {
     my @args = @_;
@@ -139,11 +146,13 @@ sub GetInterface() {
 
 my %node;
 
-sub PersistR() {
-    my ( $sHost, $virtualname ) = @_;
+sub PersistR {
+    my ( $sHost, $virtualname_aref ) = @_;
     my $virtual = &GetInterface( "$sHost", "LocalLB", "VirtualServer" );
     $soapResponse = $virtual->get_persistence_record(
-        SOAP::Data->name( virtual_servers => ["$virtualname"] ),
+
+        #SOAP::Data->name( virtual_servers => ["$virtualname"] ),
+        SOAP::Data->name( virtual_servers => [ @{$virtualname_aref} ] ),
         SOAP::Data->name(
             persistence_modes => ["PERSISTENCE_MODE_SOURCE_ADDRESS_AFFINITY"]
         ),
@@ -152,11 +161,9 @@ sub PersistR() {
     &checkResponse($soapResponse);
     my @prsAofA = @{ $soapResponse->result };
 
-    print "virtual name: $virtualname\n\n";
-
     foreach my $prsofA (@prsAofA) {
         print
-          "pool_name\t\taddress\t\tport\tsource_address\tcreate_time\tage\n\n";
+"pool_name\t\taddress\t\tport\tsource_address\tvirtual_server\tcreate_time\tage\n\n";
 
         foreach my $prs ( @{$prsofA} ) {
             my $pool_name         = $prs->{"pool_name"};
@@ -164,34 +171,44 @@ sub PersistR() {
             my $port              = $prs->{node_server}->{port};
             my $mode              = $prs->{mode};
             my $persistence_value = $prs->{persistence_value};
+            my $virtual_server    = $prs->{virtual_server}->{name};
             my $create_time       = $prs->{create_time};
             my $age               = $prs->{age};
             print
-"$pool_name\t$address\t$port\t$persistence_value\t$create_time\t$age\n\n";
+"$pool_name\t$address\t$port\t$persistence_value\t$virtual_server\t$create_time\t$age\n\n";
+            my $s = $node{$virtual_server} ||=
+              { virtual_server => $virtual_server };
 
-            if ( exists $node{$persistence_value} ) {
+            #if ( exists $node {$persistence_value} ) {
+            if ( defined $s->{$persistence_value} ) {
 
-                if ( $node{$persistence_value} ne $address ) {
+                if ( $s->{$persistence_value} ne $address ) {
+
+#doDebug("ALARM: client ip: $persistence_value persist record: $node{$persistence_value}, $address\n");
                     doDebug(
-"ALARM: client ip: $persistence_value persist record: $node{$persistence_value}, $address\n"
+"ALARM: virtual: $virtual_server: client ip: $persistence_value new record: $s->{$persistence_value}: create_time $s->{create_time} , old record: $address create_time: $create_time \n"
                     );
-                    my $cmd =
-"/usr/bin/tmsh delete ltm persistence persist-records virtual $virtualname node-addr $address";
-                    system $cmd;
-                    doDebug(
-"client ip: $persistence_value persist record: $address deleted \n"
-                    );
+                    if ( $s->{create_time} >= $create_time ) {
+                        my $cmd =
+"/usr/bin/tmsh delete ltm persistence persist-records virtual $virtual_server node-addr $address";
+                        system $cmd;
+                        doDebug(
+"virtual: $virtual_server: client ip: $persistence_value old record: $address create_time: $create_time deleted \n"
+                        );
 
 #print "client ip: $persistence_value persist record: $node{$persistence_value}, $address\n";
-#		exit(1);
+#			exit(1);
+                    }
                 }
 
             }
             else {
 
-                $node{$persistence_value} = $address;
+                #$node {$persistence_value} = $address;
+                $s->{$persistence_value} = $address;
+                $s->{create_time} = $create_time;
 
-#             doDebug("client ip: $persistence_value persist record: $address first found\n");
+#                doDebug("client ip: $persistence_value persist record: $address create time: $create_time age: $age first found\n");
             }
 
         }
@@ -225,7 +242,7 @@ while (1) {
 
     print "time: $localtime, microseconds: $microseconds\n\n";
 
-    &PersistR( "127.0.0.1", "$virtualname" );
+    &PersistR( "127.0.0.1", \@virtualnames );
 
 #usleep(100); # !!!please only sleep 100 microsecond in test, not in production. it slow down all tmm processes
 
