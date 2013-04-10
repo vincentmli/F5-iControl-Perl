@@ -7,6 +7,19 @@ use Sys::Syslog;
 use POSIX qw(strftime);
 use Getopt::Long;
 
+#----------------------------------------------------------------------------
+# Validate Arguments, customer can change
+#----------------------------------------------------------------------------
+my $sHost;
+my $sPort     = "443";
+my $sUID      = "admin";    #change username
+my $sPWD      = "admin";    #change password
+my $sProtocol = "https";
+
+#----------------------------------------------------------------------------
+# Validate Arguments, customer change end
+#----------------------------------------------------------------------------
+
 my $PID_FILE = "/var/run/get_persist.pid";
 my $program  = "GET_PERSIST";
 
@@ -41,24 +54,13 @@ sub SOAP::Deserializer::typecast {
     return $retval;
 }
 
-# End Of File
-
-#----------------------------------------------------------------------------
-# Validate Arguments, customer can change
-#----------------------------------------------------------------------------
-my $sHost;
-my $sPort     = "443";
-my $sUID      = "admin";    #change username
-my $sPWD      = "admin";    #change password
-my $sProtocol = "https";
-
-#----------------------------------------------------------------------------
-# Validate Arguments, customer change end
-#----------------------------------------------------------------------------
-
 my @virtualnames;
+my $delete;
 
-GetOptions( "virtual|v=s" => \@virtualnames, );
+GetOptions(
+    "virtual|v=s" => \@virtualnames,
+    "delete|d"    => \$delete,
+);
 
 @virtualnames = split( /,/, join( ',', @virtualnames ) );
 
@@ -74,7 +76,10 @@ use constant DEBUG_SYSLOG => 2;
 my $debug = 2;
 
 sub usage {
-    print " $0 -v virtualname\n";
+    print " $0\n
+		-v virtualname
+		-d delete record\n";
+    exit(1);
 }
 
 sub doDebug {
@@ -188,16 +193,21 @@ sub PersistR {
                     doDebug(
 "ALARM: virtual: $virtual_server: client ip: $persistence_value new record: $s->{$persistence_value}: create_time $s->{create_time} , old record: $address create_time: $create_time \n"
                     );
-                    if ( $s->{create_time} >= $create_time ) {
-                        my $cmd =
+
+                    if ( defined $delete ) {
+
+                        if ( $s->{create_time} >= $create_time ) {
+                            my $cmd =
 "/usr/bin/tmsh delete ltm persistence persist-records virtual $virtual_server node-addr $address";
-                        system $cmd;
-                        doDebug(
+                            system $cmd;
+                            doDebug(
 "virtual: $virtual_server: client ip: $persistence_value old record: $address create_time: $create_time deleted \n"
-                        );
+                            );
 
 #print "client ip: $persistence_value persist record: $node{$persistence_value}, $address\n";
-#			exit(1);
+#				exit(1);
+                        }
+
                     }
                 }
 
