@@ -20,6 +20,7 @@ use constant MAX_EXTENSION      => 100;
 my %ICONTROL_TYPECAST_TYPES = (
     '{urn:iControl}Management.UserManagement.UserRole' => 1,
     '{urn:iControl}Common.EnabledState'                => 1,
+    '{urn:iControl}Common.AddressPort'                 => 1,
     '{urn:iControl}LocalLB.ProfileType'                => 1,
     '{urn:iControl}LocalLB.ProfileContextType'         => 1,
     '{urn:iControl}LTConfig.Class'                     => 1,
