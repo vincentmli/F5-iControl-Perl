@@ -31,9 +31,10 @@ if ( ("80" eq $sPort) or ("8080" eq $sPort) )
         $sProtocol = "http";
 }
 
-if ( ($sUID eq "") or ($sPWD eq "") or ($sPool eq "") )
+#if ( ($sUID eq "") or ($sPWD eq "") or ($sPool eq "") )
+if ( ($sUID eq "") or ($sPWD eq "")  )
 {
-        die ("Usage: $0 <admin_user> <admin_password> <pool_name>\n");
+        die ("Usage: $0 <admin_user> <admin_password>\n");
 }
 
 open(my $fh, '>>', "$stat") or die $!;
@@ -629,11 +630,15 @@ sub rstCause {
   if ( $flag ) {
     print "turned on reset cause!\n\n";
     my $cmd = "/usr/bin/tmsh modify sys db tm.rstcause.log value \"enable\" ";
+    my $logger = "/bin/logger -p local0.notice \"turned on reset cause!\" ";
     system($cmd);
+    system($logger);
   } else {
     print "turned off reset cause\n\n";
     my $cmd = "/usr/bin/tmsh modify sys db tm.rstcause.log value \"disable\" ";
+    my $logger = "/bin/logger -p local0.notice \"turned off reset cause!\" ";
     system("$cmd");
+    system("$logger");
   }
 }
 
@@ -920,7 +925,10 @@ if (lc($TRIGGER) =~ /time/) {
    }
 
    print "received log message, sleeping $FOUND_MESSAGE_WAIT seconds then stopping tcpdumps and write pool state to $stat\n";
-   &getPoolInfo($sPool);
+   my $cmd_log = "/bin/logger -p local0.notice  \"matches: $LOG_MESSAGE \" ";
+   system($cmd_log);
+   #&getPoolInfo($sPool);
+   getAllPoolInfo();
    rstCause(0);
    sleep($FOUND_MESSAGE_WAIT);
 }
