@@ -183,25 +183,27 @@ sub delete_all_pools {
 
 =head2 get_member_v2 
 
-Retrieves a list of all pools
+Gets a list of pool members.
 
-Return type: String []       The list of pool names.
+Return type: String []       The list of pool members for the specified pools
 
-get_member_v2()
+get_member_v2($pool_names)
 
 =over 4
+
+=item - $pool_names: The names of the pools 
 
 =back
 
 =cut
 
 sub get_member_v2 {
-    my ($self,$pool_name) = @_;
+    my ($self,$pool_names) = @_;
     my $soap =
       SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
 
     my $all_som = $soap->get_member_v2(
-        SOAP::Data->name( pool_names => [$pool_name] ),
+        SOAP::Data->name( pool_names => [$pool_names] ),
     );
     $self->check_error( fault_obj => $all_som );
     my @result = @{ $all_som->result };
