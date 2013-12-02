@@ -23,7 +23,7 @@ iControl provides an Object Oriented Perl interface to implement some of
 the interfaces provided by iControl.
 
 %prep
-%setup -q -n iControl-%{version}
+%setup -q
 
 %build
 %{__perl} Makefile.PL INSTALLDIRS=vendor
