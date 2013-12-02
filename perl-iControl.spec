@@ -1,5 +1,5 @@
 Name:           perl-iControl
-Version:        1.101
+Version:        1.102
 Release:        1%{?dist}
 Summary:        Perl module for iControl functionality. It provides methods that use iControl via SOAP::Lite to manage bigip
 License:        CHECK(GPL+ or Artistic)
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Mon Dec 02 2013 Greg Petras <greg.petras@nwea.org> 1.102-1
+- corrected %setup as the directory name has changed (greg.petras@nwea.org)
+
 * Mon Dec 02 2013 Greg Petras <greg.petras@nwea.org> 1.101-1
 - first package of perl-iControl.
 
