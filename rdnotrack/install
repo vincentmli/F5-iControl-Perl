@@ -1,0 +1,15 @@
+#!/bin/sh
+/bin/rm -rf /root/bin
+/bin/mkdir /root/bin
+
+/bin/cp -f rdnotrack /root/bin/
+/bin/cp -f rdnotrack_bigstart /etc/bigstart/scripts/rdnotrack
+
+echo "start rdnotrack service..."
+/usr/bin/bigstart add rdnotrack 
+
+
+echo "wait 10 second to check service status..."
+sleep 10
+
+/usr/bin/bigstart status rdnotrack 

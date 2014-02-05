@@ -1,0 +1,5 @@
+#v.li@f5.com
+# disable netfilter conntrack for non default route domain bigstart script
+# run ./install to install rdnotrack bigstart script
+# run ./remove to remove rdnotrack bigstart script
+# rdnotrack script will keep running after reboot

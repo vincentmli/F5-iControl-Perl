@@ -1,0 +1,24 @@
+#!/bin/sh
+service=rdnotrack
+
+# First argument passed to these scripts is the number of starts
+start_cnt=1
+
+# load common functions and clear down indicators
+. /usr/lib/bigstart/functions
+clear_down ${service}
+
+# redirect bigstart output into a log file when debug is on
+log_output ${service}
+
+# wait for processes we are dependent on
+depend ${service} mcpd running 1 ${start_cnt}
+
+# set resource limits, affinity, etc
+setproperties ${service}
+
+# record that we're starting
+logthestart ${service} ${start_cnt}
+
+# start daemon in the foreground for daemontools to work.
+exec /root/bin/${service}

@@ -1,0 +1,6 @@
+#!/bin/sh
+/usr/bin/bigstart stop rdnotrack; /usr/bin/bigstart status rdnotrack 
+echo "Deleting rdnotrack..."
+/usr/bin/bigstart erase rdnotrack 
+/bin/rm -rf /root/bin
+/bin/rm -f /etc/bigstart/scripts/rdnotrack

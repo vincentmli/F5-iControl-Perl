@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+
+#use SOAP::Lite + trace => qw(method debug);
+use SOAP::Lite;
+use MIME::Base64;
+use Sys::Syslog;
+use POSIX qw(strftime);
+use Getopt::Long;
+
+#----------------------------------------------------------------------------
+# Validate Arguments, customer can change
+#----------------------------------------------------------------------------
+my $sHost;
+my $sPort     = "443";
+my $sUID      = "admin";    #change username
+my $sPWD      = "admin";    #change password
+my $sProtocol = "https";
+
+#----------------------------------------------------------------------------
+# Validate Arguments, customer change end
+#----------------------------------------------------------------------------
+
+my $PID_FILE = "/var/run/rdnotrack.pid";
+my $program  = "RDNOTRACK";
+
+use Time::HiRes
+  qw( usleep ualarm gettimeofday tv_interval nanosleep clock_gettime clock_getres clock_nanosleep);
+
+#set global variable $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} to workaround the SSL verification restriction
+# and modified SSL.pm to remove the SSL verification alert, got better idea ?
+
+
+sub BEGIN {
+    $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+}
+
+my $TIMEOUT = 30; #default 30 seconds
+
+my $sleep;
+
+GetOptions(
+    "sleep|s=s" => \$sleep,
+);
+
+my $period = defined ( $sleep ) ? $sleep : $TIMEOUT;
+
+# the debug log variable is a bit mask
+# debug = 0 NO LOGGING
+# debug | 1 STDOUT
+# debug | 2 syslog
+# you can enable none, either or both
+use constant DEBUG_STDOUT => 1;
+use constant DEBUG_SYSLOG => 2;
+my $debug = 2;
+
+
+sub doDebug {
+    my @args = @_;
+    if ( $debug & DEBUG_STDOUT ) {
+        print STDOUT @args;
+    }
+    if ( $debug & DEBUG_SYSLOG ) {
+        syslog( 'LOG_LOCAL0|LOG_DEBUG', @args );
+    }
+}
+
+openlog( 'RDNOCONNTRACK', 'pid', 'LOG_LOCAL0' );
+
+####### DAEMONIZE #############
+
+sub daemonize {
+    use POSIX;
+    POSIX::setsid or die "setsid: $!";
+    my $pid = fork();
+    if ( $pid < 0 ) {
+        die "fork: $!";
+    }
+    elsif ($pid) {
+        exit 0;
+    }
+    chdir "/";
+    umask 0;
+    foreach ( 0 .. ( POSIX::sysconf(&POSIX::_SC_OPEN_MAX) || 1024 ) ) {
+        POSIX::close $_;
+    }
+    open( STDIN,  "</dev/null" );
+    open( STDOUT, ">/dev/null" );
+    open( STDERR, ">&STDOUT" );
+
+}
+
+# kill old self, write pid file
+if ( -f $PID_FILE ) {
+    open( PIDFILE, "<$PID_FILE" );
+    kill( 15, <PIDFILE> );
+    close(PIDFILE);
+}
+
+open( PIDFILE, ">$PID_FILE" );
+syswrite( PIDFILE, $$ );
+close(PIDFILE);
+
+#daemonize();
+
+# GetInterface
+#----------------------------------------------------------------------------
+sub GetInterface() {
+    my ( $sHost, $module, $name ) = @_;
+    my $Interface =
+      SOAP::Lite->uri("urn:iControl:$module/$name")->readable(1)
+      ->proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+
+   #----------------------------------------------------------------------------
+   # Attempt to add auth headers to avoid dual-round trip
+   #----------------------------------------------------------------------------
+    eval {
+        $Interface->transport->http_request->header( 'Authorization' => 'Basic '
+              . MIME::Base64::encode( "$sUID:$sPWD", '' ) );
+    };
+
+    return $Interface;
+}
+
+sub getRD {
+    my ( $sHost )  = @_;
+    my $rd = &GetInterface( "$sHost", "Networking", "RouteDomain" );
+    $soapResponse = $rd->get_list();
+    &checkResponse($soapResponse);
+    my @rds = @{ $soapResponse->result };
+
+    foreach my $id (@rds) {
+        next if ( $id == 0 );
+        my $rt = system("rdexec $id iptables -t raw -n -L | grep NOTRACK >> /dev/null");
+#        print "id: $id rt: $rt\n";
+        if ( $rt != 0 ) {
+		system("rdexec $id iptables -t raw -A PREROUTING -j NOTRACK >> /dev/null");	
+		system("rdexec $id iptables -t raw -A OUTPUT -j NOTRACK >> /dev/null");	
+	}
+    }
+
+}
+
+sub checkResponse() {
+    my ($soapResponse) = (@_);
+    if ( $soapResponse->fault ) {
+        print $soapResponse->faultcode, " ", $soapResponse->faultstring, "\n";
+        exit();
+    }
+}
+
+while (1) {
+    my ( $seconds, $microseconds ) = gettimeofday;
+
+    my $localtime = scalar localtime("$seconds");
+
+#    print "-----------------------------------------------------\n\n";
+
+#    print "time: $localtime, microseconds: $microseconds\n\n";
+
+    &getRD( "127.0.0.1");
+
+    sleep ($period);
+
+}
+
+closelog();
