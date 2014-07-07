@@ -33,7 +33,7 @@
 use SOAP::Lite;
 use MIME::Base64;
 
-BEGIN {push (@INC, ".."); $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;}
+BEGIN {push (@INC, "/usr/local/lib"); $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;}
 use iControlTypeCast;
 
 #----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ else
 }
 
 
-sleep 5; 
+sleep 30; 
 
 &setMonitorInstance(1);
 
