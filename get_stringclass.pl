@@ -39,9 +39,8 @@ my $sHost = $ARGV[0];
 my $sPort = $ARGV[1];
 my $sUID = $ARGV[2];
 my $sPWD = $ARGV[3];
-my $sPool = $ARGV[4];
+my $sClass = $ARGV[4];
 my $sNodeAddr = $ARGV[5];
-my $sAddDel = $ARGV[6];
 my $sProtocol = "https";
 
 BEGIN {
@@ -54,7 +53,7 @@ BEGIN {
 
 sub usage()
 {
-	die ("Usage: togglePoolMember.pl host port uid pwd [pool [addr:port]]\n");
+	die ("Usage: getstringclass.pl host port uid pwd class\n");
 }
 
 if ( ($sHost eq "") or ($sPort eq "") or ($sUID eq "") or ($sPWD eq "") )
@@ -75,24 +74,15 @@ sub SOAP::Transport::HTTP::Client::get_basic_credentials
 	return "$sUID" => "$sPWD";
 }
 
-$Pool = SOAP::Lite
-	-> uri('urn:iControl:LocalLB/Pool')
-	-> readable(1)
-	-> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
-$PoolMember = SOAP::Lite
-	-> uri('urn:iControl:LocalLB/PoolMember')
+$Class = SOAP::Lite
+	-> uri('urn:iControl:LocalLB/Class')
 	-> readable(1)
 	-> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
 
 #----------------------------------------------------------------------------
 # Attempt to add auth headers to avoid dual-round trip
 #----------------------------------------------------------------------------
-eval { $Pool->transport->http_request->header
-(
-	'Authorization' =>
-	'Basic ' . MIME::Base64::encode("$sUID:$sPWD", '')
-); };
-eval { $PoolMember->transport->http_request->header
+eval { $Class->transport->http_request->header
 (
 	'Authorization' =>
 	'Basic ' . MIME::Base64::encode("$sUID:$sPWD", '')
@@ -115,16 +105,16 @@ sub SOAP::Deserializer::typecast
 #----------------------------------------------------------------------------
 # Main logic
 #----------------------------------------------------------------------------
-if ( "" eq $sPool )
+if ( "" eq $sClass )
 {
 	#------------------------------------------------------------------------
 	# No pool supplied.  Query pool list and display members for given pool
 	#------------------------------------------------------------------------
-	$soapResponse = $Pool->get_list();
+	$soapResponse = $Class->get_string_class_list();
 	&checkResponse($soapResponse);
-	@pool_list = @{$soapResponse->result};
+	@class_list = @{$soapResponse->result};
 	
-	&showPoolMembers(@pool_list);
+	&showClassMembers(@class_list);
 }
 elsif ( "" eq $sNodeAddr )
 {
@@ -138,80 +128,15 @@ else
 	#------------------------------------------------------------------------
 	# both pool and member supplied so toggle the specified member.
 	#------------------------------------------------------------------------
-	#&togglePoolMember($sPool, $sNodeAddr);
-	if( $sAddDel == 1 ){
-
-		&addPoolMember($sPool, $sNodeAddr);
-	} else {
-		&delPoolMember($sPool, $sNodeAddr);
-	}
-	&showPoolMembers($sPool);
-}
-
-sub addPoolMember()
-{
-
-        my ($pool_name, $member_def) = (@_);
-
-        #------------------------------------------------------------------------
-        # Split apart node:port
-        #------------------------------------------------------------------------
-        ($sNodeIP, $sNodePort) = split(/:/, $member_def, 2);
-        if ( "" eq $sNodePort )
-        {
-                $sNodePort = "0";
-        }
-        $member = { address => $sNodeIP, port => $sNodePort };
-	
-	push @MembersList, $member;
-	
-        $soapResponse =
-                $Pool->add_member_v2
-                (
-                        SOAP::Data->name ( pool_names => ( [$pool_name] ) ),
-                        SOAP::Data->name ( members => ( [ [ @MembersList ] ] ) ),
-                );
-        &checkResponse($soapResponse);
-
-	 print "Pool Member {$sNodeIP:$sNodePort} added to $pool_name\n";
-		
-}
-
-sub delPoolMember()
-{
-
-        my ($pool_name, $member_def) = (@_);
-
-        #------------------------------------------------------------------------
-        # Split apart node:port
-        #------------------------------------------------------------------------
-        ($sNodeIP, $sNodePort) = split(/:/, $member_def, 2);
-        if ( "" eq $sNodePort )
-        {
-                $sNodePort = "0";
-        }
-        $member = { address => $sNodeIP, port => $sNodePort };
-	
-	push @MembersList, $member;
-	
-        $soapResponse =
-                $Pool->remove_member_v2
-                (
-                        SOAP::Data->name ( pool_names => ( [$pool_name] ) ),
-                        SOAP::Data->name ( members => ( [ [ @MembersList ] ] ) ),
-                );
-        &checkResponse($soapResponse);
-
-	 print "Pool Member {$sNodeIP:$sNodePort} removed from $pool_name\n";
-		
+	&togglePoolMember($sPool, $sNodeAddr);
 }
 
 #----------------------------------------------------------------------------
 # Show list of pools and members
 #----------------------------------------------------------------------------
-sub showPoolMembers()
+sub showClassMembers()
 {
-	my (@pool_list) = @_;
+	my (@class_list) = @_;
 	my @member_state_lists = &getPoolMemberStates(@pool_list);
 	
 	print "Available pool members\n";
@@ -223,7 +148,6 @@ sub showPoolMembers()
 		@member_state_list = @{@member_state_lists[$i]};
 		foreach $member_state (@member_state_list)
 		{
-			sleep 5;
 			$member = $member_state->{"member"};
 			$addr = $member->{"address"};
 			$port = $member->{"port"};

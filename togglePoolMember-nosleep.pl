@@ -223,7 +223,6 @@ sub showPoolMembers()
 		@member_state_list = @{@member_state_lists[$i]};
 		foreach $member_state (@member_state_list)
 		{
-			sleep 5;
 			$member = $member_state->{"member"};
 			$addr = $member->{"address"};
 			$port = $member->{"port"};

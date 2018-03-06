@@ -83,7 +83,7 @@ $Monitor->transport->http_request->header
 );
 
 
-&setMonitorInstance(0);
+#&setMonitorInstance(0);
 
 if ( $sPool eq "" )
 {
@@ -97,7 +97,7 @@ else
 
 sleep 30; 
 
-&setMonitorInstance(1);
+#&setMonitorInstance(1);
 
 if ( $sPool eq "" )
 {
@@ -206,8 +206,8 @@ sub getPoolMemberMonitorInfo()
 	# Get Member List
 	$soapResponse = $Pool->get_monitor_instance
 	(
-		#SOAP::Data->name(pool_names => [@pool_list])
-		SOAP::Data->name(pool_names => ['pool_72-99'])
+		SOAP::Data->name(pool_names => [@pool_list])
+		#SOAP::Data->name(pool_names => ['pool_72-99'])
 	);
 	&checkResponse($soapResponse);
 	my @MonitorInstanceStateAofA = @{$soapResponse->result};

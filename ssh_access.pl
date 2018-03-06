@@ -44,7 +44,7 @@ sub SOAP::Transport::HTTP::Client::get_basic_credentials
 
 $soap = SOAP::Lite
         -> uri('urn:iControl:System/Services')
-        -> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+        -> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi", ssl_opts => [ SSL_verify_mode => 0 ]);
 eval { $soap->transport->http_request->header
 (
         'Authorization' =>

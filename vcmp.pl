@@ -97,7 +97,9 @@ sub GetInterface() {
     my ( $sHost, $module, $name ) = @_;
     my $Interface =
       SOAP::Lite->uri("urn:iControl:$module/$name")->readable(1)
-      ->proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+      ->proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi",
+	      ssl_opts => [ SSL_verify_mode => 0 ]
+      );
 
    #----------------------------------------------------------------------------
    # Attempt to add auth headers to avoid dual-round trip
