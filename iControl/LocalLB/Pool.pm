@@ -73,6 +73,36 @@ sub new {
     $self;
 }
 
+=head2 add_member_v2
+
+Adds members to the specified pools
+
+add_member_v2($pool_names, $members_ref)
+
+https://devcentral.f5.com/wiki/iControl.LocalLB__Pool__add_member_v2.ashx
+
+=over 4
+
+=item - $pool_names: The names of the pools 
+
+=item - $members_ref: The lists of initial members of the pools,pass in array ref 
+
+=back
+
+=cut
+
+sub add_member_v2 {
+    my ( $self, $pool_names, $members_ref ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+    my $all_som = $soap->add_member_v2(
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( members    => [ [ @{$members_ref} ] ] ),
+    );
+    $self->check_error( fault_obj => $all_som );
+
+}
+
 =head2 create_v2
 
 Creates a new pool
@@ -147,6 +177,92 @@ sub delete_all_pools {
     my $soap =
       SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
     my $all_som = $soap->delete_all_pools();
+    $self->check_error( fault_obj => $all_som );
+
+}
+
+=head2 get_member_v2 
+
+Gets a list of pool members.
+
+Return type: String []       The list of pool members for the specified pools
+
+get_member_v2($pool_names)
+
+=over 4
+
+=item - $pool_names: The names of the pools 
+
+=back
+
+=cut
+
+sub get_member_v2 {
+    my ($self,$pool_names) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+
+    my $all_som = $soap->get_member_v2(
+        SOAP::Data->name( pool_names => [$pool_names] ),
+    );
+    $self->check_error( fault_obj => $all_som );
+    my @result = @{ $all_som->result };
+    return @result;
+
+}
+
+=head2 get_list 
+
+Retrieves a list of all pools
+
+Return type: String []       The list of pool names.
+
+get_list()
+
+=over 4
+
+=back
+
+=cut
+
+sub get_list {
+    my ($self) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+
+    my $all_som = $soap->get_list();
+    $self->check_error( fault_obj => $all_som );
+    my @result = @{ $all_som->result };
+    return @result;
+
+}
+
+=head2 remove_member_v2
+
+Remove members from the specified pools
+
+remove_member_v2($pool_names, $members_ref)
+
+https://devcentral.f5.com/wiki/iControl.LocalLB__Pool__remove_member_v2.ashx
+
+=over 4
+
+=item - $pool_names: The names of the pools 
+
+=item - $members_ref: The lists of initial members of the pools,pass in array ref 
+
+=back
+
+=cut
+
+sub remove_member_v2 {
+    my ( $self, $pool_names, $members_ref ) = @_;
+    my $soap =
+      SOAP::Lite->uri('urn:iControl:LocalLB/Pool')->proxy( $self->{_proxy} );
+    my $all_som = $soap->remove_member_v2(
+        SOAP::Data->name( pool_names => [$pool_names] ),
+        SOAP::Data->name( members    => [ [ @{$members_ref} ] ] ),
+    );
     $self->check_error( fault_obj => $all_som );
 
 }
